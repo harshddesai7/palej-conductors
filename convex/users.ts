@@ -27,7 +27,7 @@ export const seedUsers = mutation({
         // For this specific request, we will ensure the user records exist.
 
         const users = [
-            { email: "deepak@rediffmail.com", name: "Deepak" },
+            { email: "deepak009dr@rediffmail.com", name: "Deepak" },
             { email: "workwithharshdesai@gmail.com", name: "Harsh" }
         ];
 
