@@ -1,7 +1,7 @@
 # Repository Index
 
-- **AGENTS.md**: Agent Standard Operating Procedures (SOPs).
-- **AI_CONTEXT.md**: Project context, goals, and technical specs.
-- **Palej Brochure.pdf**: Official product brochure.
-- **.agent/**: Agent configuration and workflows.
+- [src/lib/calculators/engine.ts](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/lib/calculators/engine.ts): Core math logic for all calculators.
+- [src/app/dashboard](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/app/dashboard): Authenticated calculator pages.
+- [convex/schema.ts](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/convex/schema.ts): Database schema and auth tables.
+- [.env.local](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/.env.local): Local environment variables.
     - **workflows/**: Definitions for `/d` and `/v` commands.

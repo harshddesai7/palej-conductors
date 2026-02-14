@@ -1,6 +1,8 @@
 # Agent Logs
 
-## [2026-02-14] Project Setup
-- Created `AI_CONTEXT.md` with detailed company and product info.
-- Created `REPO_INDEX.md` and `PROJECT_URLS.md`.
-- Initialized `LOGS.md` and `LEARNINGS.md`.
+## [2026-02-14] Phase 1: Calculator App Migration
+- Scaffolded Next.js + Convex project with light glassmorphic theme.
+- Implemented modular math engine in `src/lib/calculators/engine.ts`.
+- Built Unified, Bare, Factor, and LME Copper calculators.
+- Configured Convex Auth (Password) and seeded `deepak@rediffmail.com` and `workwithharshdesai@gmail.com`.
+- Verified build and environment setup.
