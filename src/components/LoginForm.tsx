@@ -17,10 +17,16 @@ export function LoginForm() {
         setError(null);
 
         try {
+            // Try signing in first
             await signIn("password", { email, password, flow: "signIn" });
-        } catch (err) {
-            console.error(err);
-            setError("Invalid email or password");
+        } catch {
+            try {
+                // If sign-in fails, account may not exist yet — create it
+                await signIn("password", { email, password, flow: "signUp" });
+            } catch (err) {
+                console.error(err);
+                setError("Invalid email or password");
+            }
         } finally {
             setLoading(false);
         }
