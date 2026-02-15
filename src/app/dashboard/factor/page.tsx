@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useMutation } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
 import {
     calculateFactor,
     CONSTANTS
@@ -14,6 +16,9 @@ import {
 import { cn } from "@/lib/utils";
 
 export default function FactorCalculatorPage() {
+    const saveCalculation = useMutation(api.calculations.save);
+    const [isSaving, setIsSaving] = useState(false);
+
     const [material, setMaterial] = useState<"ALUMINIUM" | "COPPER">("ALUMINIUM");
 
     const [inputs, setInputs] = useState({
@@ -43,19 +48,41 @@ export default function FactorCalculatorPage() {
         setInputs(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
     };
 
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            await saveCalculation({
+                type: "Factor",
+                material,
+                inputs,
+                results: { factor }
+            });
+            alert("Factor saved!");
+        } catch (err) {
+            console.error(err);
+            alert("Save failed.");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Factor Calculator</h1>
-                    <p className="text-slate-500 mt-1">Reverse-engineer insulation factors</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Factor Calculator</h1>
+                    <p className="text-slate-500 mt-1 text-sm sm:text-base">Reverse-engineer insulation factors</p>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl shadow-lg transition-all text-sm font-medium">
-                    <Save className="w-4 h-4" /> Save
+                <button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl shadow-lg transition-all text-sm font-medium w-full sm:w-auto disabled:opacity-50"
+                >
+                    {isSaving ? "Saving..." : <><Save className="w-4 h-4" /> Save</>}
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
                 <div className="glass p-8 rounded-3xl space-y-8">
                     <div className="space-y-3">
                         <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Material Density</label>

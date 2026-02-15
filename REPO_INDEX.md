@@ -2,6 +2,20 @@
 
 - [src/lib/calculators/engine.ts](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/lib/calculators/engine.ts): Core math logic for all calculators.
 - [src/app/dashboard](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/app/dashboard): Authenticated calculator pages.
-- [convex/schema.ts](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/convex/schema.ts): Database schema and auth tables.
+- [src/app/dashboard/calculator/page.tsx](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/app/dashboard/calculator/page.tsx): Unified Calculator with insulation presets & save.
+- [src/app/dashboard/bare/page.tsx](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/app/dashboard/bare/page.tsx): Bare Calculator with insulation picklist & save.
+- [src/app/dashboard/factor/page.tsx](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/app/dashboard/factor/page.tsx): Factor Calculator with save.
+- [src/app/dashboard/lme/page.tsx](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/app/dashboard/lme/page.tsx): LME Copper Pricing with date field & save.
+- [src/app/dashboard/fabrication/page.tsx](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/app/dashboard/fabrication/page.tsx): Fabrication List dashboard (139 imported logs).
+- [src/app/dashboard/competitors/page.tsx](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/app/dashboard/competitors/page.tsx): Competitor Rates market intelligence module.
+- [src/app/dashboard/instructions/page.tsx](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/app/dashboard/instructions/page.tsx): Work Instructions production queue.
+- [src/app/dashboard/die-calculator/page.tsx](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/app/dashboard/die-calculator/page.tsx): Aluminium Die Calculator.
+- [convex/schema.ts](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/convex/schema.ts): Database schema: `users`, `fabrication`, `calculations`, `competitor_rates`, `work_instructions`.
+- [convex/calculations.ts](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/convex/calculations.ts): Save/list mutations for calculation history (auth-gated).
+- [convex/competitor_rates.ts](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/convex/competitor_rates.ts): Add/list mutations for competitor pricing.
+- [convex/instructions.ts](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/convex/instructions.ts): Create/list/updateStatus for work instructions.
+- [convex/fabrication.ts](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/convex/fabrication.ts): List query for imported fabrication data.
+- [src/components/Sidebar.tsx](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/src/components/Sidebar.tsx): Sidebar navigation (8 items).
+- [docs/Calculations.md](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/docs/Calculations.md): Definitive math engine formulas and factor matrix.
 - [.env.local](file:///c:/Users/Harsh/.gemini/antigravity/playground/Palej/.env.local): Local environment variables.
-    - **workflows/**: Definitions for `/d` and `/v` commands.
+- **.agent/workflows/**: Definitions for `/d` and `/v` commands.

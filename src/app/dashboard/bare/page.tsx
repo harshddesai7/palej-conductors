@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useMutation } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
 import {
-    CONSTANTS
+    CONSTANTS,
+    getDefaultThickness,
+    InsulationType
 } from "@/lib/calculators/engine";
 import {
     Box,
@@ -13,8 +17,12 @@ import {
 import { cn } from "@/lib/utils";
 
 export default function BareCalculatorPage() {
+    const saveCalculation = useMutation(api.calculations.save);
+    const [isSaving, setIsSaving] = useState(false);
+
     const [material, setMaterial] = useState<"ALUMINIUM" | "COPPER">("ALUMINIUM");
     const [shape, setShape] = useState<"WIRE" | "STRIP">("STRIP");
+    const [insulation, setInsulation] = useState<string>("Bare");
 
     const [inputs, setInputs] = useState({
         width: 0,
@@ -45,19 +53,42 @@ export default function BareCalculatorPage() {
         setInputs(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
     };
 
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            await saveCalculation({
+                type: "Bare",
+                material,
+                shape,
+                inputs: { ...inputs, insulation },
+                results: { bareArea, weight }
+            });
+            alert("Calculation saved!");
+        } catch (err) {
+            console.error(err);
+            alert("Save failed.");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Bare Calculator</h1>
-                    <p className="text-slate-500 mt-1">Basic dimensional & weight analysis</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Bare Calculator</h1>
+                    <p className="text-slate-500 mt-1 text-sm sm:text-base">Basic dimensional & weight analysis</p>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl shadow-lg transition-all text-sm font-medium">
-                    <Save className="w-4 h-4" /> Save
+                <button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl shadow-lg transition-all text-sm font-medium w-full sm:w-auto disabled:opacity-50"
+                >
+                    {isSaving ? "Saving..." : <><Save className="w-4 h-4" /> Save</>}
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
                 <div className="glass p-8 rounded-3xl space-y-8">
                     <div className="flex gap-4">
                         <button
@@ -91,6 +122,42 @@ export default function BareCalculatorPage() {
                                 shape === "WIRE" ? "bg-white text-slate-900 shadow-sm" : "text-slate-400"
                             )}
                         >Wire</button>
+                    </div>
+
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 pl-1">Target Insulation</label>
+                            {insulation === "Cotton 42s ( cu )" && (
+                                <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">
+                                    ⚠️ Unverified
+                                </span>
+                            )}
+                        </div>
+                        <select
+                            value={insulation}
+                            onChange={(e) => setInsulation(e.target.value)}
+                            className="w-full bg-slate-100/50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all font-bold appearance-none cursor-pointer"
+                        >
+                            <option value="Bare">None (Bare Only)</option>
+                            {CONSTANTS.INSULATION_TYPES.map(type => (
+                                <option key={type.name} value={type.name}>{type.name}</option>
+                            ))}
+                        </select>
+                        {insulation !== "Bare" && (
+                            <div className="mt-2 p-3 bg-indigo-50/50 rounded-xl border border-indigo-100 flex items-center justify-between">
+                                <span className="text-[10px] font-bold uppercase text-indigo-400">Projected Covered Dim</span>
+                                <span className="text-xs font-bold text-indigo-700">
+                                    {(() => {
+                                        const type = CONSTANTS.INSULATION_TYPES.find(t => t.name === insulation);
+                                        const thk = type ? getDefaultThickness(type, shape) : 0;
+                                        if (shape === "STRIP") {
+                                            return `${(inputs.width + thk).toFixed(2)} x ${(inputs.thickness + thk).toFixed(2)} mm`;
+                                        }
+                                        return `${(inputs.dia + thk).toFixed(2)} mm (dia)`;
+                                    })()}
+                                </span>
+                            </div>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-6">

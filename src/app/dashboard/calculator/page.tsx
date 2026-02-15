@@ -1,15 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useMutation } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
 import {
     calculateStripInsulation,
     calculateWireInsulation,
+    calculateDualLayerStripInsulation,
+    calculateDualLayerWireInsulation,
+    getInsulationFactor,
+    getDefaultThickness,
     CONSTANTS,
-    InsulationResults
+    InsulationResults,
+    InsulationType
 } from "@/lib/calculators/engine";
 import {
     Zap,
-    ArrowRight,
     Info,
     RefreshCcw,
     Save
@@ -17,16 +23,23 @@ import {
 import { cn } from "@/lib/utils";
 
 export default function UnifiedCalculatorPage() {
+    const saveCalculation = useMutation(api.calculations.save);
+    const [isSaving, setIsSaving] = useState(false);
+
     // 1. Selector State
     const [material, setMaterial] = useState<"ALUMINIUM" | "COPPER">("ALUMINIUM");
     const [shape, setShape] = useState<"WIRE" | "STRIP">("STRIP");
 
-    // 2. Input State
-    const [inputs, setInputs] = useState({
-        width: 0,
-        thickness: 0,
-        dia: 0,
-        insulationThickness: 0,
+    const [selectedType, setSelectedType] = useState<string>("Manual");
+
+    // 2. Input State - Using string | number to allow empty fields without default '0'
+    const [inputs, setInputs] = useState<Record<string, string | number>>({
+        width: "",
+        thickness: "",
+        dia: "",
+        insulationThickness: "",
+        polyCov: "",
+        dfgCov: "",
         factor: 1,
         finalWtReqd: 100,
         qtyPerSpool: 25,
@@ -35,56 +48,187 @@ export default function UnifiedCalculatorPage() {
     // 3. Results State
     const [results, setResults] = useState<InsulationResults | null>(null);
 
+    const isDualLayerSelected = CONSTANTS.INSULATION_TYPES.find(t => t.name === selectedType)?.isDualLayer;
+
     // 4. Auto-calculation
     useEffect(() => {
         const density = CONSTANTS.DENSITY[material];
+        const type = CONSTANTS.INSULATION_TYPES.find(t => t.name === selectedType);
 
-        if (shape === "STRIP") {
-            if (inputs.width > 0 && inputs.thickness > 0) {
-                setResults(calculateStripInsulation({
-                    ...inputs,
-                    density
-                }));
+        // Parse inputs safely for calculation
+        const numInputs = {
+            width: Number(inputs.width) || 0,
+            thickness: Number(inputs.thickness) || 0,
+            dia: Number(inputs.dia) || 0,
+            insulationThickness: Number(inputs.insulationThickness) || 0,
+            polyCov: Number(inputs.polyCov) || 0,
+            dfgCov: Number(inputs.dfgCov) || 0,
+            factor: Number(inputs.factor) || 1,
+            finalWtReqd: Number(inputs.finalWtReqd) || 0,
+            qtyPerSpool: Number(inputs.qtyPerSpool) || 0,
+        };
+
+        if (isDualLayerSelected && type) {
+            if (shape === "STRIP") {
+                if (numInputs.width > 0 && numInputs.thickness > 0) {
+                    setResults(calculateDualLayerStripInsulation({
+                        width: numInputs.width,
+                        thickness: numInputs.thickness,
+                        polyCov: numInputs.polyCov,
+                        dfgCov: numInputs.dfgCov,
+                        polyFactor: type.layer1Factor || 1.08,
+                        dfgFactor: type.layer2Factor || 1.45,
+                        density,
+                        finalWtReqd: numInputs.finalWtReqd,
+                        qtyPerSpool: numInputs.qtyPerSpool
+                    }));
+                }
+            } else {
+                if (numInputs.dia > 0) {
+                    setResults(calculateDualLayerWireInsulation({
+                        dia: numInputs.dia,
+                        polyCov: numInputs.polyCov,
+                        dfgCov: numInputs.dfgCov,
+                        polyFactor: type.layer1Factor || 1.08,
+                        dfgFactor: type.layer2Factor || 1.45,
+                        density,
+                        finalWtReqd: numInputs.finalWtReqd,
+                        qtyPerSpool: numInputs.qtyPerSpool
+                    }));
+                }
             }
         } else {
-            if (inputs.dia > 0) {
-                setResults(calculateWireInsulation({
-                    ...inputs,
-                    density
+            if (shape === "STRIP") {
+                if (numInputs.width > 0 && numInputs.thickness > 0) {
+                    setResults(calculateStripInsulation({
+                        ...numInputs,
+                        density
+                    }));
+                }
+            } else {
+                if (numInputs.dia > 0) {
+                    setResults(calculateWireInsulation({
+                        ...numInputs,
+                        density
+                    }));
+                }
+            }
+        }
+    }, [inputs, material, shape, selectedType, isDualLayerSelected]);
+
+    // 4b. Auto-update preset defaults when material/shape changes
+    useEffect(() => {
+        if (selectedType !== "Manual") {
+            const type = CONSTANTS.INSULATION_TYPES.find(t => t.name === selectedType);
+            if (type) {
+                setInputs(prev => ({
+                    ...prev,
+                    factor: getInsulationFactor(type, material),
+                    insulationThickness: getDefaultThickness(type, shape),
+                    polyCov: type.defaultLayer1Thickness || "",
+                    dfgCov: type.defaultLayer2Thickness || "",
                 }));
             }
         }
-    }, [inputs, material, shape]);
+    }, [material, shape, selectedType]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setInputs(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+        // Store as string to support decimals and empty state
+        setInputs(prev => ({ ...prev, [name]: value }));
+        if (name === "factor" || name === "insulationThickness") {
+            setSelectedType("Manual");
+        }
+    };
+
+    const handleTypeChange = (typeName: string) => {
+        setSelectedType(typeName);
+        if (typeName === "Manual") return;
+
+        const type = CONSTANTS.INSULATION_TYPES.find(t => t.name === typeName);
+        if (type) {
+            setInputs(prev => ({
+                ...prev,
+                factor: getInsulationFactor(type, material),
+                insulationThickness: getDefaultThickness(type, shape),
+                polyCov: type.defaultLayer1Thickness || "",
+                dfgCov: type.defaultLayer2Thickness || "",
+            }));
+        }
+    };
+
+    const handleSave = async () => {
+        if (!results) return;
+        setIsSaving(true);
+        try {
+            await saveCalculation({
+                type: "Unified",
+                material,
+                shape,
+                inputs: {
+                    width: Number(inputs.width) || 0,
+                    thickness: Number(inputs.thickness) || 0,
+                    dia: Number(inputs.dia) || 0,
+                    insulationThickness: Number(inputs.insulationThickness) || 0,
+                    polyCov: Number(inputs.polyCov) || 0,
+                    dfgCov: Number(inputs.dfgCov) || 0,
+                    factor: Number(inputs.factor) || 0,
+                    finalWtReqd: Number(inputs.finalWtReqd) || 0,
+                    qtyPerSpool: Number(inputs.qtyPerSpool) || 0,
+                    insulationType: selectedType
+                },
+                results
+            });
+            alert("Calculation saved successfully!");
+        } catch (err) {
+            console.error(err);
+            alert("Failed to save calculation.");
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header Area */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Unified Calculator</h1>
-                    <p className="text-slate-500 mt-1">Multi-material insulation & weight planning</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Unified Calculator</h1>
+                    <p className="text-slate-500 mt-1 text-sm sm:text-base">Multi-material insulation & weight planning</p>
                 </div>
-                <div className="flex gap-3">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white/50 hover:bg-white text-slate-600 rounded-xl border border-white/20 transition-all text-sm font-medium">
+                <div className="flex gap-2 sm:gap-3">
+                    <button
+                        onClick={() => setInputs({
+                            width: "",
+                            thickness: "",
+                            dia: "",
+                            insulationThickness: "",
+                            polyCov: "",
+                            dfgCov: "",
+                            factor: 1,
+                            finalWtReqd: 100,
+                            qtyPerSpool: 25,
+                        })}
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white/50 hover:bg-white text-slate-600 rounded-xl border border-white/20 transition-all text-xs sm:text-sm font-medium"
+                    >
                         <RefreshCcw className="w-4 h-4" /> Reset
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl shadow-lg hover:shadow-xl transition-all text-sm font-medium">
-                        <Save className="w-4 h-4" /> Save Result
+                    <button
+                        onClick={handleSave}
+                        disabled={isSaving || !results}
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-slate-900 text-white rounded-xl shadow-lg hover:shadow-xl transition-all text-xs sm:text-sm font-medium disabled:opacity-50"
+                    >
+                        {isSaving ? "Saving..." : <><Save className="w-4 h-4" /> Save</>}
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                 {/* Input Column */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="glass p-8 rounded-3xl space-y-8">
+                    <div className="glass p-5 sm:p-8 rounded-3xl space-y-6 sm:space-y-8">
                         {/* Primary Selectors */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-3">
                                 <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Material</label>
                                 <div className="flex p-1 bg-slate-100/50 rounded-2xl border border-slate-100">
@@ -126,50 +270,114 @@ export default function UnifiedCalculatorPage() {
                             </div>
                         </div>
 
-                        {/* Dimensional Inputs */}
-                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 pt-4 border-t border-slate-100/50">
+                        {/* Insulation Selector */}
+                        <div className="space-y-3 pt-4 border-t border-slate-100/50">
+                            <div className="flex items-center justify-between">
+                                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Insulation Preset</label>
+                                {selectedType === "Cotton 42s ( cu )" && (
+                                    <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100 animate-pulse">
+                                        ⚠️ Unverified in DS
+                                    </span>
+                                )}
+                            </div>
+                            <select
+                                value={selectedType}
+                                onChange={(e) => handleTypeChange(e.target.value)}
+                                className="w-full bg-slate-100/50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all font-bold appearance-none cursor-pointer"
+                            >
+                                <option value="Manual">Manual Entry (Custom Factor)</option>
+                                {CONSTANTS.INSULATION_TYPES.map(type => (
+                                    <option key={type.name} value={type.name}>{type.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 pt-4 sm:pt-6 border-t border-slate-100/50">
                             {shape === "STRIP" ? (
                                 <>
-                                    <InputGroup label="Width (mm)" name="width" value={inputs.width} onChange={handleInputChange} placeholder="e.g. 10.0" />
-                                    <InputGroup label="Thickness (mm)" name="thickness" value={inputs.thickness} onChange={handleInputChange} placeholder="e.g. 1.5" />
+                                    <InputGroup label="Width (mm)" name="width" value={inputs.width} onChange={handleInputChange} />
+                                    <InputGroup label="Thickness (mm)" name="thickness" value={inputs.thickness} onChange={handleInputChange} />
                                 </>
                             ) : (
-                                <InputGroup label="Diameter (mm)" name="dia" value={inputs.dia} onChange={handleInputChange} placeholder="e.g. 2.5" />
+                                <InputGroup label="Diameter (mm)" name="dia" value={inputs.dia} onChange={handleInputChange} />
                             )}
-                            <InputGroup label="Insulation Thk (mm)" name="insulationThickness" value={inputs.insulationThickness} onChange={handleInputChange} placeholder="e.g. 0.05" />
-                            <InputGroup label="Insulation Factor" name="factor" value={inputs.factor} onChange={handleInputChange} placeholder="1.0" />
-                            <InputGroup label="Total Weight (kg)" name="finalWtReqd" value={inputs.finalWtReqd} onChange={handleInputChange} placeholder="100" />
-                            <InputGroup label="Qty/Spool (kg)" name="qtyPerSpool" value={inputs.qtyPerSpool} onChange={handleInputChange} placeholder="25" />
+
+                            {isDualLayerSelected ? (
+                                <>
+                                    <InputGroup
+                                        label="Poly Covering (mm)"
+                                        name="polyCov"
+                                        value={inputs.polyCov}
+                                        onChange={handleInputChange}
+                                        highlight
+                                    />
+                                    <InputGroup
+                                        label="DFG Covering (mm)"
+                                        name="dfgCov"
+                                        value={inputs.dfgCov}
+                                        onChange={handleInputChange}
+                                        highlight
+                                    />
+                                </>
+                            ) : (
+                                <>
+                                    <InputGroup
+                                        label="Insulation Thk (mm)"
+                                        name="insulationThickness"
+                                        value={inputs.insulationThickness}
+                                        onChange={handleInputChange}
+                                        highlight={selectedType !== "Manual"}
+                                    />
+                                    <InputGroup
+                                        label="Insulation Factor"
+                                        name="factor"
+                                        value={inputs.factor}
+                                        onChange={handleInputChange}
+                                        highlight={selectedType !== "Manual"}
+                                    />
+                                </>
+                            )}
+                            <InputGroup label="Total Weight (kg)" name="finalWtReqd" value={inputs.finalWtReqd} onChange={handleInputChange} />
+                            <InputGroup label="Qty/Spool (kg)" name="qtyPerSpool" value={inputs.qtyPerSpool} onChange={handleInputChange} />
                         </div>
                     </div>
                 </div>
 
                 {/* Results Column */}
                 <div className="space-y-6">
-                    <div className="glass p-8 rounded-3xl bg-slate-900 text-white shadow-2xl relative overflow-hidden group">
+                    <div className="p-6 sm:p-8 rounded-3xl bg-slate-900 text-white shadow-2xl relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-700">
                             <Zap className="w-24 h-24" />
                         </div>
 
                         <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6">Live Calculations</h2>
 
-                        <div className="space-y-6 relative z-10">
-                            <ResultRow label="Bare Area" value={results?.bareArea.toFixed(4) || "0.0000"} unit="mm²" />
-                            <ResultRow label="Insulated Area" value={results?.insulatedArea.toFixed(4) || "0.0000"} unit="mm²" />
-                            <div className="py-4 border-y border-white/10">
-                                <ResultRow label="% Weight Increase" value={results?.percentIncrease.toFixed(2) || "0.00"} unit="%" highlight />
-                            </div>
-                            <ResultRow label="Bare Wt Reqd" value={results?.bareWtReqd.toFixed(2) || "0.00"} unit="kg" />
-                            <ResultRow label="Meters/Spool" value={results?.metersPerSpool.toFixed(0) || "0"} unit="m" />
-                            <ResultRow label="Production" value={results?.productionKgHr.toFixed(2) || "0.00"} unit="kg/hr" />
+                        <div className="space-y-5 relative z-10">
+                            <ResultRow label="Bare Area" value={results?.bareArea.toFixed(4) || "—"} unit="mm²" />
+                            <ResultRow label="Insulated Area" value={results?.insulatedArea.toFixed(4) || "—"} unit="mm²" />
 
-                            <div className="pt-6 mt-4 border-t border-white/10 flex items-center justify-between">
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] font-bold uppercase text-slate-400">Total Production Time</span>
-                                    <span className="text-2xl font-bold">{results?.totalHoursReqd.toFixed(2) || "0.00"} hrs</span>
+                            {results?.dualLayer ? (
+                                <div className="space-y-4 py-4 border-y border-white/10">
+                                    <ResultRow label="Poly % Increase" value={results.dualLayer.polyPercent.toFixed(2)} unit="%" />
+                                    <ResultRow label="DFG % Increase" value={results.dualLayer.dfgPercent.toFixed(2)} unit="%" />
+                                    <ResultRow label="Total % Increase" value={results.percentIncrease.toFixed(2)} unit="%" highlight />
+                                    <ResultRow label="Wt after Poly" value={results.dualLayer.weightAfterPoly.toFixed(2)} unit="kg" />
                                 </div>
-                                <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
-                                    <ArrowRight className="w-6 h-6 text-indigo-400" />
+                            ) : (
+                                <div className="py-4 border-y border-white/10">
+                                    <ResultRow label="% Weight Increase" value={results?.percentIncrease.toFixed(2) || "0.00"} unit="%" highlight />
+                                </div>
+                            )}
+
+                            <ResultRow label="Bare Wt Reqd" value={results?.bareWtReqd.toFixed(2) || "—"} unit="kg" />
+                            <ResultRow label="Meters/Spool" value={results?.metersPerSpool.toFixed(0) || "—"} unit="m" />
+                            <ResultRow label="Production" value={results?.productionKgHr.toFixed(2) || "—"} unit="kg/hr" />
+
+                            <div className="pt-5 mt-4 border-t border-white/10">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total Production Time</span>
+                                <div className="flex items-baseline gap-2 mt-1">
+                                    <span className="text-3xl font-bold text-indigo-400">{results?.totalHoursReqd.toFixed(2) || "0.00"}</span>
+                                    <span className="text-sm font-bold text-slate-400">hours</span>
                                 </div>
                             </div>
                         </div>
@@ -190,7 +398,7 @@ export default function UnifiedCalculatorPage() {
     );
 }
 
-function InputGroup({ label, name, value, onChange, placeholder }: any) {
+function InputGroup({ label, name, value, onChange, highlight }: any) {
     return (
         <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 pl-1">{label}</label>
@@ -199,9 +407,11 @@ function InputGroup({ label, name, value, onChange, placeholder }: any) {
                 name={name}
                 value={value}
                 onChange={onChange}
-                placeholder={placeholder}
                 step="0.01"
-                className="w-full bg-white/40 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-300 font-medium"
+                className={cn(
+                    "w-full bg-white/40 border rounded-xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-300 font-medium",
+                    highlight ? "border-indigo-500 bg-indigo-50/50 ring-1 ring-indigo-500" : "border-slate-200"
+                )}
             />
         </div>
     );

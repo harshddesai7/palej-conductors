@@ -62,3 +62,19 @@
 
 ## 🧪 Quality Assurance
 - **Tests Performed:** Tan Delta, HV Breakdown, Peel, Elongation, Tensile Strength, Resistance, Springiness, Jerk, Vickers, Stiffness, Heat Shock, Solvent Test, Dimensions, etc.
+
+## 🖥️ Current Application State (Phase 2 Complete)
+- **Stack:** Next.js 16 + Convex + Tailwind CSS + Convex Auth (Password)
+- **Deployment:** Vercel at `palej-conductors.vercel.app`
+- **Auth Users:** `deepak@rediffmail.com`, `workwithharshdesai@gmail.com`
+- **Modules (8):**
+  1. Unified Calculator (insulation presets + save)
+  2. Bare Calculator (13-value picklist + save)
+  3. Factor Calculator (reverse-engineer + save)
+  4. LME Copper Pricing (date field + save)
+  5. Fabrication List (139 imported production logs)
+  6. Competitor Rates (market intelligence + entries)
+  7. Work Instructions (production queue with status machine)
+  8. Die Calculator (aluminium die time estimation)
+- **Phase 3 Complete:** Comprehensive forensic audit of legacy math (`PCPL-development.ds`). Definitive reference at `docs/Calculations.md`. 
+- **Database Tables:** `users`, `fabrication`, `calculations`, `competitor_rates`, `work_instructions`
