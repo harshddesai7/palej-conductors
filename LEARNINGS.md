@@ -18,6 +18,7 @@
 - **Insulation Material Nuance**: Polyester factors are material-dependent (Alu=1.396, Cu=1.08) in standalone forms, but the Poly layer in dual-layer combos (Poly+DFG) uses a fixed 1.08 factor regardless of material. Always verify the context of the formula in legacy DS systems.
 - **Dual-Layer Reduction**: Combo products require a two-stage Bare Weight reduction (Outer Layer → Inner Layer) rather than a single additive factor for 100% accuracy.
 - **Auth Setup (CRITICAL)**: Always use `npx @convex-dev/auth --skip-git-check --allow-dirty-git-state` to initialize auth secrets. This generates proper PKCS#8 RSA keys and sets `JWT_PRIVATE_KEY`, `JWKS`, and `SITE_URL`. **Never** manually set `JWT_PRIVATE_KEY` or `CONVEX_AUTH_SECRET` via CLI — shell quoting mangles PEM formatting and extra env vars conflict with the auth library.
+- **Responsiveness**: Removing default values/placeholders must be verified on Mobile/Tablet viewports. Soft keyboards/small screens can expose UX issues missed on desktop. Added to SOP.
 ---
 last_audit: 2026-02-15
 status: Phase 5 Complete - 100% Math Parity Verified

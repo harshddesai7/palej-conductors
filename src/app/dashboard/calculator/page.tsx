@@ -18,7 +18,8 @@ import {
     Zap,
     Info,
     RefreshCcw,
-    Save
+    Save,
+    ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -280,16 +281,19 @@ export default function UnifiedCalculatorPage() {
                                     </span>
                                 )}
                             </div>
-                            <select
-                                value={selectedType}
-                                onChange={(e) => handleTypeChange(e.target.value)}
-                                className="w-full bg-slate-100/50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all font-bold appearance-none cursor-pointer"
-                            >
-                                <option value="Manual">Manual Entry (Custom Factor)</option>
-                                {CONSTANTS.INSULATION_TYPES.map(type => (
-                                    <option key={type.name} value={type.name}>{type.name}</option>
-                                ))}
-                            </select>
+                            <div className="relative">
+                                <select
+                                    value={selectedType}
+                                    onChange={(e) => handleTypeChange(e.target.value)}
+                                    className="w-full bg-slate-100/50 border border-slate-200 rounded-2xl pl-4 pr-10 py-3 text-slate-900 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all font-bold appearance-none cursor-pointer truncate"
+                                >
+                                    <option value="Manual">Manual Entry (Custom Factor)</option>
+                                    {CONSTANTS.INSULATION_TYPES.map(type => (
+                                        <option key={type.name} value={type.name}>{type.name}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 pt-4 sm:pt-6 border-t border-slate-100/50">

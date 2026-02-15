@@ -56,3 +56,18 @@
   - Verified decimal input support (typing '.5' works).
 - **Cleanup**: Removed all `placeholder` attributes from number inputs.
 - **Verification**: Browser audit confirmed clean state initialization and reset functionality.
+
+## [2026-02-15] - Deployment
+- **Push**: `git push origin master` (Exit Code: 0).
+- **Branch**: `master` → `master` (palej-conductors).
+- **Content**: Includes Phase 5 (Frontend Audit) and Phase 6 (UX Refinements).
+
+## [2026-02-15] - SOP Update
+- **Goal**: Enforce responsiveness verification.
+- **Action**: Updated `AGENTS.md` (Step 7) to include mandatory Mobile (375px) and Tablet (768px) checks.
+- **Verification**: Confirmed "no placeholder/default" fix works on mobile/tablet viewports.
+
+## [2026-02-15] - User Management
+- **Action**: Registered temporary user `contactus.palejconductors@gmail.com`.
+- **Method**: Browser automation via Login/SignUp flow.
+- **Expiry warning**: Remind user to remove in 1-2 weeks.

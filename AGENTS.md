@@ -117,6 +117,7 @@ Before reading the prompt, you MUST verify:
 - **Method**: Use the most effective method available:
     - **CLI**: Run build scripts, test commands, or curl requests.
     - **Browser**: Use the browser tool to verify UI changes visually.
+    - **Responsiveness**: **MANDATORY**: Verify UI changes on Mobile (375px) and Tablet (768px) viewports.
     - **API**: Check endpoints.
 - **Constraint**: If you cannot verify it automatically, you must have a very strong reason why.
 
