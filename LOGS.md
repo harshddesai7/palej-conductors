@@ -204,6 +204,21 @@
   - `unique_check True` across all non-empty tabs.
   - Opened `Phase1_Master_Consolidated_Unique.xlsx` in Microsoft Excel.
 
+## [2026-02-16] - Staging Frontend Audit (Automated Testing)
+- **Goal**: Comprehensive frontend testing of staging app after UI consolidation.
+- **Method**: Playwright E2E automated testing (8 test cases).
+- **Results**: ✅ **ALL 8 TESTS PASSING** (21.6s duration)
+- **Test Coverage**:
+  - ✅ Sidebar navigation (3 calculators only)
+  - ✅ Factor Calculator: Dash display when incomplete, correct calculation
+  - ✅ Unified Calculator: Mode toggle (Insulated/Bare)
+  - ✅ Unified Calculator: Bare mode calculations (20 mm², 54.18 kg verified)
+  - ✅ Unified Calculator: kV selector for Poly+DFG presets
+  - ✅ Bare redirect: /dashboard/bare → /calculator?mode=bare
+  - ✅ Save functionality: All calculators
+- **Artifacts**: `docs/test_staging.spec.ts`, `docs/staging_audit_results.md`, `playwright.config.ts`
+- **Status**: All critical functionality verified. Ready for production deployment.
+
 ## [2026-02-16] - Staging UI Consolidation (Modules Hidden)
 - **Goal**: Simplify staging UI; preserve code for future restoration.
 - **Factor Calculator**: Fixed output display — added `percentageIncrease > 0` to condition; show "—" when inputs incomplete.

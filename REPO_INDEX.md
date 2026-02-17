@@ -36,6 +36,9 @@
 - [docs/INSULATION_PDF_TO_EXCEL_SOP.md](docs/INSULATION_PDF_TO_EXCEL_SOP.md): Reusable SOP for transforming insulation PDFs to 4-tab Excel workbooks (extraction, marking, reverse-factor).
 - [docs/PHASE1_EXCEL_FACTOR_REVIEW.md](docs/PHASE1_EXCEL_FACTOR_REVIEW.md): Phase 1 business-readable review of top-3 factors and confidence for all regenerated Excel files.
 - [docs/verify_calculators.ts](docs/verify_calculators.ts): Regression verification script for all calculator math (29 checks). Run: `npx tsx docs/verify_calculators.ts`.
+- [docs/test_staging.spec.ts](docs/test_staging.spec.ts): Playwright E2E test suite for staging app (8 tests). Run: `npx playwright test docs/test_staging.spec.ts`.
+- [docs/staging_audit_results.md](docs/staging_audit_results.md): Automated frontend audit results (all tests passing).
+- [playwright.config.ts](playwright.config.ts): Playwright configuration for E2E testing.
 - [Phase1_Master_Consolidated.xlsx](Phase1_Master_Consolidated.xlsx): Master workbook with 28 tabs (7 insulation files x 4 material/shape tabs), green-row-only deduped output, and top-3 factor highlighting.
 - [Phase1_Master_Consolidated_Unique.xlsx](Phase1_Master_Consolidated_Unique.xlsx): Final unique-only version per tab (one best row per size key based on green mark, weight, scrap-rate priority).
 - [Phase1_Master_Consolidated_Unique_Clear.xlsx](Phase1_Master_Consolidated_Unique_Clear.xlsx): Readability-cleaned unique workbook with duplicate marker columns removed and top-3 factor highlighting preserved.
