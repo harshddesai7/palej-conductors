@@ -204,6 +204,14 @@
   - `unique_check True` across all non-empty tabs.
   - Opened `Phase1_Master_Consolidated_Unique.xlsx` in Microsoft Excel.
 
+## [2026-02-17] - Staging Deployment (palej-app-staging)
+- **Goal**: Deploy Phase 2 changes to a new staging project (Vercel, GitHub, Convex) without touching production.
+- **GitHub**: Created [palej-app-staging](https://github.com/harshddesai7/palej-app-staging), pushed Phase 2 baseline.
+- **Vercel**: Created [palej-app-staging](https://palej-app-staging.vercel.app), linked to GitHub, deployed successfully.
+- **Convex**: Using existing dev deployment (keen-raccoon-545) for now. To create dedicated staging Convex: Dashboard → New Project → deploy schema → update Vercel env vars.
+- **Env vars**: NEXT_PUBLIC_CONVEX_URL, NEXT_PUBLIC_CONVEX_SITE_URL, AUTH_SECRET added to Vercel Production and Preview.
+- **Status**: Staging live at https://palej-app-staging.vercel.app. User to verify, then update production when ready.
+
 ## [2026-02-16] - Login / Tailwind Resolution Fix
 - **Issue**: "Log in not working" — Tailwind resolve error: `tailwindcss` resolved from `C:\Projects\` instead of project folder, causing CSS/build failure and stuck "Rendering..." state.
 - **Root cause**: Dev server run with wrong working directory (e.g. workspace root `C:\Projects` instead of `Palej Calculation App`).
