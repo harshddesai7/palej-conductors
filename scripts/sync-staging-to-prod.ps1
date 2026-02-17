@@ -115,11 +115,12 @@ if ($response -ne "y" -and $response -ne "Y") {
     exit 1
 }
 
-# Push to production
+# Push to production (force push since repos may have diverged)
 Write-Host ""
 Write-Host "Pushing to production..." -ForegroundColor Yellow
+Write-Host "Note: Using force push since staging and production are separate repos" -ForegroundColor Yellow
 $pushRef = "${currentCommit}:refs/heads/${Branch}"
-git push $PROD_REMOTE_NAME $pushRef
+git push $PROD_REMOTE_NAME $pushRef --force
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Push failed!" -ForegroundColor Red
     exit 1
