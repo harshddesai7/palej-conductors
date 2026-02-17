@@ -33,7 +33,7 @@ export default function FactorCalculatorPage() {
     useEffect(() => {
         const density = CONSTANTS.DENSITY[material];
 
-        if (inputs.width > 0 && inputs.thickness > 0 && inputs.covering > 0) {
+        if (inputs.width > 0 && inputs.thickness > 0 && inputs.covering > 0 && inputs.percentageIncrease > 0) {
             setFactor(calculateFactor({
                 ...inputs,
                 density
@@ -119,7 +119,7 @@ export default function FactorCalculatorPage() {
 
                     <div className="space-y-2">
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Calculated Factor</span>
-                        <div className="text-7xl font-black text-white">{factor.toFixed(6)}</div>
+                        <div className="text-7xl font-black text-white">{factor > 0 ? factor.toFixed(6) : "—"}</div>
                     </div>
 
                     <div className="glass rounded-2xl p-4 w-full bg-white/5 border-white/10 flex items-center justify-center gap-3">

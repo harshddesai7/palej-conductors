@@ -204,6 +204,19 @@
   - `unique_check True` across all non-empty tabs.
   - Opened `Phase1_Master_Consolidated_Unique.xlsx` in Microsoft Excel.
 
+## [2026-02-16] - Staging UI Consolidation (Modules Hidden)
+- **Goal**: Simplify staging UI; preserve code for future restoration.
+- **Factor Calculator**: Fixed output display — added `percentageIncrease > 0` to condition; show "—" when inputs incomplete.
+- **Unified Calculator**: Added Bare mode (Insulated/Bare toggle). Bare mode: dimensions + length → bare area + weight.
+- **Bare Calculator**: Removed from sidebar; `/dashboard/bare` redirects to `/dashboard/calculator?mode=bare`.
+- **Removed from Sidebar** (pages retained, accessible via direct URL):
+  - Bare Calculator (functionality merged into Unified Calculator)
+  - Fabrication List
+  - Competitor Rates
+  - Work Instructions
+  - Die Calculator
+- **Restore later**: Re-add items to `navigation` in [src/components/Sidebar.tsx](src/components/Sidebar.tsx). Consider enhancing with better functionalities before re-enabling.
+
 ## [2026-02-16] - Phase 2 Completion: Poly+DFG 450/900 & Staging Deploy
 - **Goal**: Complete remaining Phase 2 plan items and deploy to staging (local → live).
 - **Engine** (`src/lib/calculators/engine.ts`):

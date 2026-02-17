@@ -8,8 +8,8 @@
 
 - [src/lib/calculators/engine.ts](src/lib/calculators/engine.ts): Core math logic for all calculators. Supports kV-specific factors (Poly+DFG 8kV/18kV), material-restricted presets, and combined-factor dual-layer.
 - [src/app/dashboard](src/app/dashboard): Authenticated calculator pages.
-- [src/app/dashboard/calculator/page.tsx](src/app/dashboard/calculator/page.tsx): Unified Calculator with insulation presets & save.
-- [src/app/dashboard/bare/page.tsx](src/app/dashboard/bare/page.tsx): Bare Calculator with insulation picklist & save.
+- [src/app/dashboard/calculator/page.tsx](src/app/dashboard/calculator/page.tsx): Unified Calculator with Insulated/Bare mode toggle, insulation presets & save.
+- [src/app/dashboard/bare/page.tsx](src/app/dashboard/bare/page.tsx): Redirects to `/dashboard/calculator?mode=bare` (Bare merged into Unified).
 - [src/app/dashboard/factor/page.tsx](src/app/dashboard/factor/page.tsx): Factor Calculator with save.
 - [src/app/dashboard/lme/page.tsx](src/app/dashboard/lme/page.tsx): LME Copper Pricing with date field & save.
 - [src/app/dashboard/fabrication/page.tsx](src/app/dashboard/fabrication/page.tsx): Fabrication List dashboard (139 imported logs).

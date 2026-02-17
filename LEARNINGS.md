@@ -40,6 +40,8 @@
 - **Local Build Requirement**: `npm run build` requires `NEXT_PUBLIC_CONVEX_URL` in environment. If missing, ConvexReactClient throws "No address provided". Set via `.env.local` or `$env:NEXT_PUBLIC_CONVEX_URL="https://...convex.cloud"` before build. Vercel injects this automatically.
 - **Cursor Slash Commands**: Project commands live in `.cursor/commands/*.md`. Filename = command name (e.g. `d.md` → `/d`). Content is injected as prompt when user types `/d` + message. Migrated from `.agent/workflows/` (anti-gravity) to native Cursor commands.
 - **Dual-Layer Combined Factor**: For presets where image/Excel provide a single combined factor (e.g. Poly+DFG 1.45 at 8kV), use single-layer formula with `totalCovering = layer1 + layer2` instead of two-stage per-layer reduction. This matches how factors were derived and simplifies resolution logic. Legacy `calculateDualLayer*` functions retained for potential future use.
+- **Factor Calculator**: Output requires `percentageIncrease > 0`; otherwise formula returns 0. Gate the calculation condition and show "—" when inputs incomplete.
+- **Bare Mode Consolidation**: Unified Calculator now has Insulated/Bare toggle. Bare mode: dimensions + length → bare area + weight. Use `?mode=bare` for direct link. Components using `useSearchParams` need `Suspense` wrapper for Next.js.
 
 ---
 last_audit: 2026-02-16

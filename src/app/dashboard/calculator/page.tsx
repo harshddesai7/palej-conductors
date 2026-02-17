@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useMutation } from "convex/react";
+import { Loader2 } from "lucide-react";
 import { api } from "../../../../convex/_generated/api";
 import {
     calculateStripInsulation,
@@ -20,9 +22,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function UnifiedCalculatorPage() {
+function UnifiedCalculatorContent() {
+    const searchParams = useSearchParams();
     const saveCalculation = useMutation(api.calculations.save);
     const [isSaving, setIsSaving] = useState(false);
+
+    // 0. Mode: Insulated (default) or Bare
+    const [mode, setMode] = useState<"INSULATED" | "BARE">("INSULATED");
 
     // 1. Selector State
     const [material, setMaterial] = useState<"ALUMINIUM" | "COPPER">("ALUMINIUM");
@@ -36,6 +42,7 @@ export default function UnifiedCalculatorPage() {
         width: "",
         thickness: "",
         dia: "",
+        length: 1000,
         insulationThickness: "",
         polyCov: "",
         dfgCov: "",
@@ -46,10 +53,43 @@ export default function UnifiedCalculatorPage() {
 
     // 3. Results State
     const [results, setResults] = useState<InsulationResults | null>(null);
+    const [bareResults, setBareResults] = useState<{ bareArea: number; weight: number } | null>(null);
 
     const selectedTypeConfig = CONSTANTS.INSULATION_TYPES.find((t) => t.name === selectedType);
     const isDualLayerSelected = selectedTypeConfig?.isDualLayer;
     const hasKVOptions = selectedTypeConfig?.kVOptions && selectedTypeConfig.kVOptions.length > 0;
+
+    // Initialize mode from ?mode=bare (e.g. from /dashboard/bare redirect)
+    useEffect(() => {
+        if (searchParams.get("mode") === "bare") {
+            setMode("BARE");
+        }
+    }, [searchParams]);
+
+    // Bare mode calculation
+    useEffect(() => {
+        if (mode !== "BARE") {
+            setBareResults(null);
+            return;
+        }
+        const density = CONSTANTS.DENSITY[material];
+        const w = Number(inputs.width) || 0;
+        const t = Number(inputs.thickness) || 0;
+        const d = Number(inputs.dia) || 0;
+        const len = Number(inputs.length) || 0;
+        let area = 0;
+        if (shape === "STRIP" && w > 0 && t > 0) {
+            area = w * t;
+        } else if (shape === "WIRE" && d > 0) {
+            area = 0.785 * d * d;
+        }
+        if (area > 0 && len > 0) {
+            const weight = (area * density * len) / 1000;
+            setBareResults({ bareArea: area, weight });
+        } else {
+            setBareResults(null);
+        }
+    }, [mode, inputs, material, shape]);
 
     // Reset to Manual when material conflicts with material-restricted preset
     useEffect(() => {
@@ -59,8 +99,9 @@ export default function UnifiedCalculatorPage() {
         }
     }, [material, selectedType, selectedTypeConfig?.materialRestriction]);
 
-    // 4. Auto-calculation
+    // 4. Auto-calculation (Insulated mode only)
     useEffect(() => {
+        if (mode === "BARE") return;
         const density = CONSTANTS.DENSITY[material];
         const type = CONSTANTS.INSULATION_TYPES.find(t => t.name === selectedType);
 
@@ -121,24 +162,23 @@ export default function UnifiedCalculatorPage() {
                 }
             }
         }
-    }, [inputs, material, shape, selectedType, isDualLayerSelected]);
+    }, [mode, inputs, material, shape, selectedType, isDualLayerSelected]);
 
-    // 4b. Auto-update preset defaults when material/shape/kV changes
+    // 4b. Auto-update preset defaults when material/shape/kV changes (Insulated only)
     useEffect(() => {
-        if (selectedType !== "Manual") {
-            const type = CONSTANTS.INSULATION_TYPES.find((t) => t.name === selectedType);
-            if (type) {
-                const kV = hasKVOptions ? (selectedKV || type.defaultKV) : undefined;
-                setInputs((prev) => ({
-                    ...prev,
-                    factor: getInsulationFactor(type, material, kV),
-                    insulationThickness: getDefaultThickness(type, shape),
-                    polyCov: type.defaultLayer1Thickness ?? "",
-                    dfgCov: type.defaultLayer2Thickness ?? "",
-                }));
-            }
+        if (mode === "BARE" || selectedType === "Manual") return;
+        const type = CONSTANTS.INSULATION_TYPES.find((t) => t.name === selectedType);
+        if (type) {
+            const kV = hasKVOptions ? (selectedKV || type.defaultKV) : undefined;
+            setInputs((prev) => ({
+                ...prev,
+                factor: getInsulationFactor(type, material, kV),
+                insulationThickness: getDefaultThickness(type, shape),
+                polyCov: type.defaultLayer1Thickness ?? "",
+                dfgCov: type.defaultLayer2Thickness ?? "",
+            }));
         }
-    }, [material, shape, selectedType, selectedKV, hasKVOptions]);
+    }, [mode, material, shape, selectedType, selectedKV, hasKVOptions]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -180,29 +220,45 @@ export default function UnifiedCalculatorPage() {
     };
 
     const handleSave = async () => {
-        if (!results) return;
         setIsSaving(true);
         try {
-            await saveCalculation({
-                type: "Unified",
-                material,
-                shape,
-                inputs: {
-                    width: Number(inputs.width) || 0,
-                    thickness: Number(inputs.thickness) || 0,
-                    dia: Number(inputs.dia) || 0,
-                    insulationThickness: Number(inputs.insulationThickness) || 0,
-                    polyCov: Number(inputs.polyCov) || 0,
-                    dfgCov: Number(inputs.dfgCov) || 0,
-                    factor: Number(inputs.factor) || 0,
-                    finalWtReqd: Number(inputs.finalWtReqd) || 0,
-                    qtyPerSpool: Number(inputs.qtyPerSpool) || 0,
-                    insulationType: selectedType,
-                    ...(selectedKV && { kV: selectedKV }),
-                },
-                results
-            });
-            alert("Calculation saved successfully!");
+            if (mode === "BARE" && bareResults) {
+                await saveCalculation({
+                    type: "Bare",
+                    material,
+                    shape,
+                    inputs: {
+                        width: Number(inputs.width) || 0,
+                        thickness: Number(inputs.thickness) || 0,
+                        dia: Number(inputs.dia) || 0,
+                        length: Number(inputs.length) || 0,
+                        insulation: "Bare",
+                    },
+                    results: bareResults
+                });
+                alert("Calculation saved successfully!");
+            } else if (results) {
+                await saveCalculation({
+                    type: "Unified",
+                    material,
+                    shape,
+                    inputs: {
+                        width: Number(inputs.width) || 0,
+                        thickness: Number(inputs.thickness) || 0,
+                        dia: Number(inputs.dia) || 0,
+                        insulationThickness: Number(inputs.insulationThickness) || 0,
+                        polyCov: Number(inputs.polyCov) || 0,
+                        dfgCov: Number(inputs.dfgCov) || 0,
+                        factor: Number(inputs.factor) || 0,
+                        finalWtReqd: Number(inputs.finalWtReqd) || 0,
+                        qtyPerSpool: Number(inputs.qtyPerSpool) || 0,
+                        insulationType: selectedType,
+                        ...(selectedKV && { kV: selectedKV }),
+                    },
+                    results
+                });
+                alert("Calculation saved successfully!");
+            }
         } catch (err) {
             console.error(err);
             alert("Failed to save calculation.");
@@ -225,6 +281,7 @@ export default function UnifiedCalculatorPage() {
                             width: "",
                             thickness: "",
                             dia: "",
+                            length: 1000,
                             insulationThickness: "",
                             polyCov: "",
                             dfgCov: "",
@@ -238,7 +295,7 @@ export default function UnifiedCalculatorPage() {
                     </button>
                     <button
                         onClick={handleSave}
-                        disabled={isSaving || !results}
+                        disabled={isSaving || (mode === "BARE" ? !bareResults : !results)}
                         className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-slate-900 text-white rounded-xl shadow-lg hover:shadow-xl transition-all text-xs sm:text-sm font-medium disabled:opacity-50"
                     >
                         {isSaving ? "Saving..." : <><Save className="w-4 h-4" /> Save</>}
@@ -250,6 +307,29 @@ export default function UnifiedCalculatorPage() {
                 {/* Input Column */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="glass p-5 sm:p-8 rounded-3xl space-y-6 sm:space-y-8">
+                        {/* Mode Toggle */}
+                        <div className="space-y-3">
+                            <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Mode</label>
+                            <div className="flex p-1 bg-slate-100/50 rounded-2xl border border-slate-100">
+                                <button
+                                    type="button"
+                                    onClick={() => setMode("INSULATED")}
+                                    className={cn(
+                                        "flex-1 py-2.5 rounded-xl text-sm font-bold transition-all",
+                                        mode === "INSULATED" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                    )}
+                                >Insulated</button>
+                                <button
+                                    type="button"
+                                    onClick={() => setMode("BARE")}
+                                    className={cn(
+                                        "flex-1 py-2.5 rounded-xl text-sm font-bold transition-all",
+                                        mode === "BARE" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                    )}
+                                >Bare</button>
+                            </div>
+                        </div>
+
                         {/* Primary Selectors */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-3">
@@ -293,7 +373,8 @@ export default function UnifiedCalculatorPage() {
                             </div>
                         </div>
 
-                        {/* Insulation Selector */}
+                        {/* Insulation Selector (Insulated mode only) */}
+                        {mode === "INSULATED" && (
                         <div className="space-y-3 pt-4 border-t border-slate-100/50">
                             <div className="flex items-center justify-between">
                                 <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Insulation Preset</label>
@@ -341,18 +422,36 @@ export default function UnifiedCalculatorPage() {
                                 </div>
                             )}
                         </div>
+                        )}
 
+                        {/* Input Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 pt-4 sm:pt-6 border-t border-slate-100/50">
-                            {shape === "STRIP" ? (
+                            {mode === "BARE" ? (
                                 <>
-                                    <InputGroup label="Width (mm)" name="width" value={inputs.width} onChange={handleInputChange} />
-                                    <InputGroup label="Thickness (mm)" name="thickness" value={inputs.thickness} onChange={handleInputChange} />
+                                    {shape === "STRIP" ? (
+                                        <>
+                                            <InputGroup label="Width (mm)" name="width" value={inputs.width} onChange={handleInputChange} />
+                                            <InputGroup label="Thickness (mm)" name="thickness" value={inputs.thickness} onChange={handleInputChange} />
+                                        </>
+                                    ) : (
+                                        <InputGroup label="Diameter (mm)" name="dia" value={inputs.dia} onChange={handleInputChange} />
+                                    )}
+                                    <div className={shape === "STRIP" ? "col-span-2" : ""}>
+                                        <InputGroup label="Length (m)" name="length" value={inputs.length} onChange={handleInputChange} />
+                                    </div>
                                 </>
                             ) : (
-                                <InputGroup label="Diameter (mm)" name="dia" value={inputs.dia} onChange={handleInputChange} />
-                            )}
+                                <>
+                                    {shape === "STRIP" ? (
+                                        <>
+                                            <InputGroup label="Width (mm)" name="width" value={inputs.width} onChange={handleInputChange} />
+                                            <InputGroup label="Thickness (mm)" name="thickness" value={inputs.thickness} onChange={handleInputChange} />
+                                        </>
+                                    ) : (
+                                        <InputGroup label="Diameter (mm)" name="dia" value={inputs.dia} onChange={handleInputChange} />
+                                    )}
 
-                            {isDualLayerSelected ? (
+                                    {isDualLayerSelected ? (
                                 <>
                                     <InputGroup
                                         label={`${selectedTypeConfig?.layer1Name ?? "Layer 1"} (mm)`}
@@ -394,8 +493,10 @@ export default function UnifiedCalculatorPage() {
                                     />
                                 </>
                             )}
-                            <InputGroup label="Total Weight (kg)" name="finalWtReqd" value={inputs.finalWtReqd} onChange={handleInputChange} />
-                            <InputGroup label="Qty/Spool (kg)" name="qtyPerSpool" value={inputs.qtyPerSpool} onChange={handleInputChange} />
+                                    <InputGroup label="Total Weight (kg)" name="finalWtReqd" value={inputs.finalWtReqd} onChange={handleInputChange} />
+                                    <InputGroup label="Qty/Spool (kg)" name="qtyPerSpool" value={inputs.qtyPerSpool} onChange={handleInputChange} />
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -407,9 +508,21 @@ export default function UnifiedCalculatorPage() {
                             <Zap className="w-24 h-24" />
                         </div>
 
-                        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6">Live Calculations</h2>
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6">
+                            {mode === "BARE" ? "Bare Analysis" : "Live Calculations"}
+                        </h2>
 
                         <div className="space-y-5 relative z-10">
+                            {mode === "BARE" ? (
+                                <>
+                                    <ResultRow label="Bare Area" value={bareResults?.bareArea.toFixed(4) || "—"} unit="mm²" />
+                                    <ResultRow label="Weight" value={bareResults?.weight.toFixed(3) || "—"} unit="kg" highlight />
+                                    <div className="pt-4 border-t border-white/10 text-xs text-slate-400">
+                                        Density: {CONSTANTS.DENSITY[material]} kg/dm³
+                                    </div>
+                                </>
+                            ) : (
+                                <>
                             <ResultRow label="Bare Area" value={results?.bareArea.toFixed(4) || "—"} unit="mm²" />
                             <ResultRow label="Insulated Area" value={results?.insulatedArea.toFixed(4) || "—"} unit="mm²" />
 
@@ -437,6 +550,8 @@ export default function UnifiedCalculatorPage() {
                                     <span className="text-sm font-bold text-slate-400">hours</span>
                                 </div>
                             </div>
+                                </>
+                            )}
                         </div>
                     </div>
 
@@ -444,8 +559,11 @@ export default function UnifiedCalculatorPage() {
                         <div className="flex gap-3">
                             <Info className="w-5 h-5 text-indigo-500 shrink-0" />
                             <div className="text-xs text-indigo-700 leading-relaxed">
-                                Calculations based on <strong>{material}</strong> density ({CONSTANTS.DENSITY[material]} kg/dm³).
-                                Production assumes default speed of {CONSTANTS.PRODUCTION.DEFAULT_SPEED_M_HR} m/hr.
+                                {mode === "BARE" ? (
+                                    <>Bare weight = area × density × length / 1000. Density: <strong>{material}</strong> ({CONSTANTS.DENSITY[material]} kg/dm³).</>
+                                ) : (
+                                    <>Calculations based on <strong>{material}</strong> density ({CONSTANTS.DENSITY[material]} kg/dm³). Production assumes default speed of {CONSTANTS.PRODUCTION.DEFAULT_SPEED_M_HR} m/hr.</>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -486,5 +604,17 @@ function ResultRow({ label, value, unit, highlight }: any) {
                 <span className="text-[10px] font-bold text-slate-500 uppercase">{unit}</span>
             </div>
         </div>
+    );
+}
+
+export default function UnifiedCalculatorPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-[400px] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+            </div>
+        }>
+            <UnifiedCalculatorContent />
+        </Suspense>
     );
 }

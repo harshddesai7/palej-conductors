@@ -4,14 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
     Calculator,
-    Database,
-    BarChart3,
     Settings,
     ChevronRight,
     Zap,
-    Box,
     TrendingDown,
-    Activity,
     X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,13 +15,8 @@ import { useSidebar } from "@/context/SidebarContext";
 
 const navigation = [
     { name: "Unified Calculator", href: "/dashboard/calculator", icon: Zap },
-    { name: "Bare Calculator", href: "/dashboard/bare", icon: Box },
     { name: "Factor Calculator", href: "/dashboard/factor", icon: Calculator },
     { name: "LME Copper", href: "/dashboard/lme", icon: TrendingDown },
-    { name: "Fabrication List", href: "/dashboard/fabrication", icon: Database },
-    { name: "Competitor Rates", href: "/dashboard/competitors", icon: BarChart3 },
-    { name: "Work Instructions", href: "/dashboard/instructions", icon: Settings },
-    { name: "Die Calculator", href: "/dashboard/die-calculator", icon: Activity },
 ];
 
 export function Sidebar() {

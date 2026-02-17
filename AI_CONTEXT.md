@@ -81,8 +81,7 @@
   - `deepak@rediffmail.com`
   - `workwithharshdesai@gmail.com`
   - `contactus.palejconductors@gmail.com` (Temporary User, added 2026-02-15)
-- **Modules (8):**
-  - All 8 modules verified with live data and logic parity (DS pass complete).
+- **Modules (staging)**: Sidebar shows Unified Calculator (with Bare mode), Factor Calculator, LME Copper. Fabrication, Competitors, Work Instructions, Die Calculator hidden from nav (pages retained for restoration).
 - **Insulation kV Upgrade (Phase 2):**
   - Poly+DFG 225, 450, 900 presets support 8 kV / 18 kV selector (Alu: 1.45 / 1.35).
   - Factors updated per image + Excel top-1 (DFG 1.50/1.70, Poly 1.40/1.30, Cotton 0.70, Enamel+DFG 0.85).
