@@ -38,7 +38,7 @@ export default function FactorCalculatorPage() {
     useEffect(() => {
         const density = CONSTANTS.DENSITY[material];
 
-        if (inputs.width > 0 && inputs.thickness > 0 && inputs.covering > 0 && inputs.percentageIncrease > 0) {
+        if (inputs.width > 0 && inputs.thickness > 0 && inputs.covering > 0 && inputs.percentageIncrease >= 0) {
             setFactor(calculateFactor({
                 ...inputs,
                 density
