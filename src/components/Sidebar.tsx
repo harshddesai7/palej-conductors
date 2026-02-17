@@ -7,7 +7,6 @@ import {
     Settings,
     ChevronRight,
     Zap,
-    TrendingDown,
     X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,7 +15,6 @@ import { useSidebar } from "@/context/SidebarContext";
 const navigation = [
     { name: "Unified Calculator", href: "/dashboard/calculator", icon: Zap },
     { name: "Factor Calculator", href: "/dashboard/factor", icon: Calculator },
-    { name: "LME Copper", href: "/dashboard/lme", icon: TrendingDown },
 ];
 
 export function Sidebar() {
