@@ -204,6 +204,18 @@
   - `unique_check True` across all non-empty tabs.
   - Opened `Phase1_Master_Consolidated_Unique.xlsx` in Microsoft Excel.
 
+## [2026-02-16] - Sidebar Cleanup (LME Copper & Settings Removal)
+- **Goal**: Remove LME Copper and Settings from sidebar navigation on both staging and production.
+- **Changes**:
+  - Removed LME Copper from `navigation` array in `src/components/Sidebar.tsx`.
+  - Removed Settings footer section from sidebar.
+  - Removed unused `TrendingDown` and `Settings` icon imports.
+- **Documentation**: Updated `AGENTS.md` to reference sync script (`scripts/sync-staging-to-prod.ps1`) in Pre-Flight and Planning sections.
+- **Deployment**: 
+  - Staging: Commit `b066610` → `palej-app-staging`
+  - Production: Synced via force push → `palej-conductors`
+- **Status**: Both environments updated. Sidebar now shows only Unified Calculator and Factor Calculator.
+
 ## [2026-02-16] - Production Deployment (Staging → Production Sync)
 - **Goal**: Deploy verified staging changes to production.
 - **Method**: Created sync script + manual force push.

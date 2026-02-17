@@ -54,6 +54,7 @@
 - **Factor Calculator**: Output requires `percentageIncrease > 0`; otherwise formula returns 0. Gate the calculation condition and show "—" when inputs incomplete.
 - **Bare Mode Consolidation**: Unified Calculator now has Insulated/Bare toggle. Bare mode: dimensions + length → bare area + weight. Use `?mode=bare` for direct link. Components using `useSearchParams` need `Suspense` wrapper for Next.js.
 - **Playwright E2E Testing**: Created automated test suite for staging app. All 8 critical tests passing. Use `npx playwright test docs/test_staging.spec.ts` for regression testing. Tests verify UI behavior, calculations, navigation, and redirects. Sequential execution (`--workers=1`) more reliable for state-dependent tests.
+- **Staging → Production Sync Script**: Use `scripts/sync-staging-to-prod.ps1` (PowerShell) or `.sh` (Bash) to sync verified staging changes to production. Script includes safety checks, commit diff display, and force push support for separate repos. Documented in `AGENTS.md` Pre-Flight and Planning sections.
 
 ---
 last_audit: 2026-02-16
