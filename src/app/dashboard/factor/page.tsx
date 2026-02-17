@@ -148,7 +148,16 @@ export default function FactorCalculatorPage() {
                     <div className="grid grid-cols-2 gap-6">
                         <InputGroup label="Width (mm)" name="width" value={inputs.width} onChange={handleInputChange} />
                         <InputGroup label="Thickness (mm)" name="thickness" value={inputs.thickness} onChange={handleInputChange} />
-                        <InputGroup label="Covering (mm)" name="covering" value={inputs.covering} onChange={handleInputChange} />
+                        <InputGroup
+                            label="Covering (mm)"
+                            name="covering"
+                            value={inputs.covering}
+                            onChange={handleInputChange}
+                            step="0.01"
+                            min={0}
+                            max={3}
+                            placeholder="0.10 - 2.2"
+                        />
                         <InputGroup label="% Increase" name="percentageIncrease" value={inputs.percentageIncrease} onChange={handleInputChange} />
                     </div>
                 </div>
@@ -197,16 +206,29 @@ export default function FactorCalculatorPage() {
     );
 }
 
-function InputGroup({ label, name, value, onChange }: any) {
+function InputGroup({ label, name, value, onChange, step = "0.001", min, max, placeholder }: {
+    label: string;
+    name: string;
+    value: number;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    step?: string;
+    min?: number;
+    max?: number;
+    placeholder?: string;
+}) {
     return (
         <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 pl-1">{label}</label>
             <input
                 type="number"
+                inputMode="decimal"
                 name={name}
                 value={value}
                 onChange={onChange}
-                step="0.001"
+                step={step}
+                min={min}
+                max={max}
+                placeholder={placeholder}
                 className="w-full bg-white/40 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all font-medium"
             />
         </div>
