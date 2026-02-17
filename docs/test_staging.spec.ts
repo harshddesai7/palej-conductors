@@ -21,10 +21,10 @@ test.describe('Staging Frontend Audit', () => {
     await page.waitForURL('**/dashboard/**', { timeout: 10000 });
   });
 
-  test('Sidebar shows only 2 calculators', async ({ page }) => {
+  test('Sidebar shows calculators and Search Database', async ({ page }) => {
     await page.waitForLoadState('networkidle');
     
-    const expectedItems = ['Unified Calculator', 'Factor Calculator'];
+    const expectedItems = ['Unified Calculator', 'Factor Calculator', 'Search Database'];
     const unexpectedItems = ['LME Copper', 'Bare Calculator', 'Fabrication List', 'Competitor Rates', 'Work Instructions', 'Die Calculator'];
     
     // Check expected items exist in sidebar
@@ -283,5 +283,59 @@ test.describe('Staging Frontend Audit', () => {
     
     // Click save
     await page.click('button:has-text("Save")');
+  });
+
+  test('Search Database - navigates and shows database selector', async ({ page }) => {
+    await page.click('text=Search Database');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
+    
+    // Check database selector buttons exist
+    await expect(page.locator('button:has-text("Unified Calculator Database")')).toBeVisible();
+    await expect(page.locator('button:has-text("Factor Calculator Database")')).toBeVisible();
+    
+    // Check search input exists
+    await expect(page.locator('input[placeholder*="Search"]')).toBeVisible();
+  });
+
+  test('Unified Calculator - shows save status after calculation', async ({ page }) => {
+    await page.click('text=Unified Calculator');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
+    
+    // Fill in valid inputs
+    await page.fill('input[name="width"]', '10');
+    await page.fill('input[name="thickness"]', '5');
+    await page.fill('input[name="length"]', '1000');
+    await page.fill('input[name="insulationThickness"]', '0.5');
+    await page.fill('input[name="factor"]', '1.05');
+    await page.fill('input[name="finalWtReqd"]', '100');
+    await page.fill('input[name="qtyPerSpool"]', '25');
+    
+    // Wait for calculation and auto-save
+    await page.waitForTimeout(2000);
+    
+    // Check for save status (either "Saving...", "Saved", or "Error saving data")
+    const saveStatus = page.locator('text=/Saving|Saved|Error saving data/');
+    await expect(saveStatus.first()).toBeVisible({ timeout: 5000 });
+  });
+
+  test('Factor Calculator - shows save status after calculation', async ({ page }) => {
+    await page.click('text=Factor Calculator');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
+    
+    // Fill in valid inputs
+    await page.fill('input[name="width"]', '12');
+    await page.fill('input[name="thickness"]', '5');
+    await page.fill('input[name="covering"]', '0.5');
+    await page.fill('input[name="percentageIncrease"]', '5');
+    
+    // Wait for calculation and auto-save
+    await page.waitForTimeout(2000);
+    
+    // Check for save status (either "Saving...", "Saved", or "Error saving data")
+    const saveStatus = page.locator('text=/Saving|Saved|Error saving data/');
+    await expect(saveStatus.first()).toBeVisible({ timeout: 5000 });
   });
 });

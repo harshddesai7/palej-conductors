@@ -4,7 +4,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const submitFeedback = mutation({
     args: {
-        calculationId: v.id("calculations"),
+        calculationId: v.id("unified_calculations"),
         verdict: v.string(), // "RIGHT", "WRONG"
         inputsSnapshot: v.any(),
         selectionSnapshot: v.any(),

@@ -6,7 +6,8 @@ import {
     Calculator,
     ChevronRight,
     Zap,
-    X
+    X,
+    Search
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/context/SidebarContext";
@@ -14,6 +15,7 @@ import { useSidebar } from "@/context/SidebarContext";
 const navigation = [
     { name: "Unified Calculator", href: "/dashboard/calculator", icon: Zap },
     { name: "Factor Calculator", href: "/dashboard/factor", icon: Calculator },
+    { name: "Search Database", href: "/dashboard/search", icon: Search },
 ];
 
 export function Sidebar() {

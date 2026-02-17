@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import {
@@ -11,13 +11,18 @@ import {
     Calculator,
     ArrowRight,
     Zap,
-    Save
+    Save,
+    Loader2,
+    CheckCircle2,
+    X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function FactorCalculatorPage() {
-    const saveCalculation = useMutation(api.calculations.save);
+    const saveCalculation = useMutation(api.factorCalculations.save);
+    const autoSaveCalculation = useMutation(api.factorCalculations.autoSave);
     const [isSaving, setIsSaving] = useState(false);
+    const [saveStatus, setSaveStatus] = useState<"IDLE" | "SAVING" | "SAVED" | "ERROR">("IDLE");
 
     const [material, setMaterial] = useState<"ALUMINIUM" | "COPPER">("ALUMINIUM");
 
@@ -43,6 +48,37 @@ export default function FactorCalculatorPage() {
         }
     }, [inputs, material]);
 
+    // Answer Hash Generation
+    const answerHash = useMemo(() => {
+        if (factor <= 0) return null;
+        return `FACTOR|${material}|${inputs.width}|${inputs.thickness}|${inputs.covering}|${inputs.percentageIncrease}|${factor.toFixed(6)}`;
+    }, [material, inputs, factor]);
+
+    // Auto-save Debounced Trigger
+    useEffect(() => {
+        if (!answerHash || factor <= 0) return;
+
+        setSaveStatus("SAVING");
+        const timeout = setTimeout(async () => {
+            try {
+                await autoSaveCalculation({
+                    material,
+                    answerHash,
+                    inputs: { ...inputs },
+                    results: { factor },
+                });
+                setSaveStatus("SAVED");
+                setTimeout(() => setSaveStatus("IDLE"), 3000);
+            } catch (err) {
+                console.error("Auto-save failed:", err);
+                setSaveStatus("ERROR");
+                setTimeout(() => setSaveStatus("IDLE"), 5000);
+            }
+        }, 1000); // 1s debounce
+
+        return () => clearTimeout(timeout);
+    }, [answerHash, material, inputs, factor, autoSaveCalculation]);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setInputs(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
@@ -50,16 +86,21 @@ export default function FactorCalculatorPage() {
 
     const handleSave = async () => {
         setIsSaving(true);
+        setSaveStatus("SAVING");
         try {
             await saveCalculation({
-                type: "Factor",
                 material,
+                answerHash: answerHash || undefined,
                 inputs,
                 results: { factor }
             });
+            setSaveStatus("SAVED");
+            setTimeout(() => setSaveStatus("IDLE"), 3000);
             alert("Factor saved!");
         } catch (err) {
             console.error(err);
+            setSaveStatus("ERROR");
+            setTimeout(() => setSaveStatus("IDLE"), 5000);
             alert("Save failed.");
         } finally {
             setIsSaving(false);
@@ -121,6 +162,30 @@ export default function FactorCalculatorPage() {
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Calculated Factor</span>
                         <div className="text-7xl font-black text-white">{factor > 0 ? factor.toFixed(6) : "—"}</div>
                     </div>
+
+                    {/* Save Status */}
+                    {factor > 0 && (
+                        <div className="w-full">
+                            {saveStatus === "SAVING" && (
+                                <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                    <span>Saving...</span>
+                                </div>
+                            )}
+                            {saveStatus === "SAVED" && (
+                                <div className="flex items-center justify-center gap-2 text-xs font-medium text-emerald-400 animate-in fade-in zoom-in duration-300">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    <span>Saved</span>
+                                </div>
+                            )}
+                            {saveStatus === "ERROR" && (
+                                <div className="flex items-center justify-center gap-2 text-xs font-medium text-rose-400 animate-in fade-in zoom-in duration-300">
+                                    <X className="w-3 h-3" />
+                                    <span>Error saving data</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     <div className="glass rounded-2xl p-4 w-full bg-white/5 border-white/10 flex items-center justify-center gap-3">
                         <Zap className="w-5 h-5 text-indigo-400" />

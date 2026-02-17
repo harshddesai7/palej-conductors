@@ -19,19 +19,21 @@ import {
     Info,
     RefreshCcw,
     Save,
-    ChevronDown
+    ChevronDown,
+    X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function UnifiedCalculatorContent() {
     const searchParams = useSearchParams();
-    const saveCalculation = useMutation(api.calculations.save);
-    const autoSaveCalculation = useMutation(api.calculations.autoSave);
+    const saveCalculation = useMutation(api.unifiedCalculations.save);
+    const autoSaveCalculation = useMutation(api.unifiedCalculations.autoSave);
     const submitFeedback = useMutation(api.feedback.submitFeedback);
     const [isSaving, setIsSaving] = useState(false);
-    const [latestCalculationId, setLatestCalculationId] = useState<Id<"calculations"> | null>(null);
+    const [latestCalculationId, setLatestCalculationId] = useState<Id<"unified_calculations"> | null>(null);
     const [feedbackStatus, setFeedbackStatus] = useState<"IDLE" | "SUBMITTING" | "DONE">("IDLE");
     const [verdict, setVerdict] = useState<"RIGHT" | "WRONG" | null>(null);
+    const [saveStatus, setSaveStatus] = useState<"IDLE" | "SAVING" | "SAVED" | "ERROR">("IDLE");
 
     // Feature Flag
     const isFeedbackEnabled = process.env.NEXT_PUBLIC_ENABLE_AUTO_FEEDBACK === "true";
@@ -185,12 +187,12 @@ function UnifiedCalculatorContent() {
 
     // 4d. Auto-save Debounced Trigger
     useEffect(() => {
-        if (!answerHash || !isFeedbackEnabled) return;
+        if (!answerHash) return;
 
+        setSaveStatus("SAVING");
         const timeout = setTimeout(async () => {
             try {
                 const id = await autoSaveCalculation({
-                    type: mode === "BARE" ? "Bare" : "Unified",
                     material,
                     shape,
                     mode,
@@ -201,16 +203,21 @@ function UnifiedCalculatorContent() {
                     results: mode === "BARE" ? bareResults : results,
                 });
                 setLatestCalculationId(id);
+                setSaveStatus("SAVED");
                 // Reset feedback state if the answer changes
                 setFeedbackStatus("IDLE");
                 setVerdict(null);
+                // Reset save status after 3 seconds
+                setTimeout(() => setSaveStatus("IDLE"), 3000);
             } catch (err) {
                 console.error("Auto-save failed:", err);
+                setSaveStatus("ERROR");
+                setTimeout(() => setSaveStatus("IDLE"), 5000);
             }
         }, 1000); // 1s debounce
 
         return () => clearTimeout(timeout);
-    }, [answerHash, isFeedbackEnabled, mode, material, shape, selectedType, selectedKV, inputs, results, bareResults, autoSaveCalculation]);
+    }, [answerHash, mode, material, shape, selectedType, selectedKV, inputs, results, bareResults, autoSaveCalculation]);
 
     // 4b. Auto-update preset defaults when material/shape/kV changes (Insulated only)
     useEffect(() => {
@@ -289,10 +296,10 @@ function UnifiedCalculatorContent() {
 
     const handleSave = async () => {
         setIsSaving(true);
+        setSaveStatus("SAVING");
         try {
             if (mode === "BARE" && bareResults) {
                 await saveCalculation({
-                    type: "Bare",
                     material,
                     shape,
                     mode,
@@ -307,10 +314,11 @@ function UnifiedCalculatorContent() {
                     },
                     results: bareResults
                 });
+                setSaveStatus("SAVED");
+                setTimeout(() => setSaveStatus("IDLE"), 3000);
                 alert("Calculation saved successfully!");
             } else if (results) {
                 await saveCalculation({
-                    type: "Unified",
                     material,
                     shape,
                     mode,
@@ -332,10 +340,14 @@ function UnifiedCalculatorContent() {
                     },
                     results
                 });
+                setSaveStatus("SAVED");
+                setTimeout(() => setSaveStatus("IDLE"), 3000);
                 alert("Calculation saved successfully!");
             }
         } catch (err) {
             console.error(err);
+            setSaveStatus("ERROR");
+            setTimeout(() => setSaveStatus("IDLE"), 5000);
             alert("Failed to save calculation.");
         } finally {
             setIsSaving(false);
@@ -640,6 +652,30 @@ function UnifiedCalculatorContent() {
                                 </>
                             )}
                         </div>
+
+                        {/* Save Status */}
+                        {(mode === "BARE" ? bareResults : results) && (
+                            <div className="mt-6 pt-6 border-t border-white/10">
+                                {saveStatus === "SAVING" && (
+                                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                        <span>Saving...</span>
+                                    </div>
+                                )}
+                                {saveStatus === "SAVED" && (
+                                    <div className="flex items-center gap-2 text-xs font-medium text-emerald-400 animate-in fade-in zoom-in duration-300">
+                                        <CheckCircle2 className="w-3 h-3" />
+                                        <span>Saved</span>
+                                    </div>
+                                )}
+                                {saveStatus === "ERROR" && (
+                                    <div className="flex items-center gap-2 text-xs font-medium text-rose-400 animate-in fade-in zoom-in duration-300">
+                                        <X className="w-3 h-3" />
+                                        <span>Error saving data</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Feedback Area */}
                         {isFeedbackEnabled && latestCalculationId && (
