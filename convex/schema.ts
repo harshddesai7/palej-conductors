@@ -30,7 +30,7 @@ export default defineSchema({
         mode: v.optional(v.string()), // "INSULATED", "BARE"
         insulationType: v.optional(v.string()),
         kV: v.optional(v.string()),
-        saveMode: v.string(), // "MANUAL", "AUTO"
+        saveMode: v.optional(v.string()), // "MANUAL", "AUTO" - optional for backward compatibility
         answerHash: v.optional(v.string()), // For duplicate prevention
         inputs: v.any(),
         results: v.any(),
