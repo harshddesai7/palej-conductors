@@ -321,26 +321,22 @@
 - **Verification**:
   - Opened `Phase1_Master_Consolidated_Unique_Clear.xlsx` in Microsoft Excel.
 
-## [2026-02-17] - Insulation Preset UX Fixes
-- **Goal**: Fix dual insulation input visibility, add total insulation display, correct enamel defaults.
-- **Changes**:
-  - Renamed `1 Poly + Paper (Alu)` to `Poly + Paper` (available for both Aluminium and Copper, factor 0.95).
-  - Updated enamel defaults: single layer `Enamel` preset default thickness 0.03 → 0.12 mm.
-  - Updated `Enamel + Dfg 900` dual layer: enamel layer default 0.03 → 0.10 mm.
-  - Added **Total Insulation (mm)** display field for all presets (computed: single = insulationThickness, dual = layer1 + layer2).
-  - Kept `Poly + Paper` as single-input preset (explicit exception despite `+` in name).
-- **Files Modified**:
-  - `src/lib/calculators/engine.ts`: Preset definitions updated.
-  - `src/app/dashboard/calculator/page.tsx`: Added total insulation display UI.
-  - `docs/verify_calculators.ts`: Extended with 6 new checks (33 total, all passing).
-  - `docs/test_staging.spec.ts`: Added 4 new E2E tests for dual/single inputs, total display, enamel defaults, material availability.
+## [2026-02-17] - Auto-Logging and Feedback System
+- **Goal**: Automatically log calculator answers and capture user feedback (Right/Wrong).
+- **Backend Changes**:
+  - Updated `calculations` schema with query-friendly metadata (`mode`, `insulationType`, `kV`, `saveMode`, `answerHash`).
+  - Added `autoSave` mutation with duplicate prevention using an answer hash.
+  - Created `feedback` table and `submitFeedback` mutation/query.
+- **Frontend Changes**:
+  - Integrated debounced (1s) auto-save into the `Unified Calculator`.
+  - Added optional Right (Green) / Wrong (Red) feedback buttons in the results panel.
+  - Implemented snapshots for inputs, selections, and results in feedback records.
+  - Optimized layout for mobile (stacked) and tablet/desktop (grid).
+  - Added feature flag `NEXT_PUBLIC_ENABLE_AUTO_FEEDBACK` to gate the feedback UI.
 - **Verification**:
-  - Engine verification: 33/33 tests passed.
-  - TypeScript compilation: `tsc --noEmit` passed.
-  - Deployed to staging: Commit `b54ed3b` → `palej-app-staging` repo.
-- **Status**: Staging deployment in progress. Ready for production sync after staging validation.
-- **Update (2026-02-17)**: Final fix - Combined into single `Poly + Paper` preset (no material suffix):
-  - Single preset `Poly + Paper` available for both Aluminium and Copper (factor 0.95)
-  - Removed material restrictions
-  - Updated verification: 33/33 tests passing
-  - Deployed to staging and production
+  - 12/12 Playwright tests passing on staging (including corrected sidebar navigation test).
+  - TypeScript compilation and linting checks completed.
+- **Deployment**:
+  - Staging: Commit `4fb6780` -> `palej-app-staging`.
+  - Production: Synced via force push -> `palej-conductors`.
+- **Status**: System live. Feedback UI hidden by default behind the environment variable feature flag.

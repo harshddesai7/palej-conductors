@@ -93,11 +93,13 @@
   - Factors updated per image + Excel top-1 (DFG 1.50/1.70, Poly 1.40/1.30, Cotton 0.70, Enamel+DFG 0.85).
   - New presets: Poly+Cotton (1.30), Poly+Paper (0.95, both materials).
   - Material-restricted presets filtered; dual-layer uses combined factor + summed covering.
-- **Insulation Preset UX Fixes (2026-02-17):**
-  - `Poly + Paper` preset (single preset, no material suffix) available for both Aluminium and Copper (factor 0.95).
-  - Enamel defaults corrected: single layer 0.12 mm, dual layer enamel 0.10 mm.
-  - Total Insulation (mm) display added for all presets (shows sum for dual-layer, single value for single-layer).
-  - All dual-layer presets show two separate insulation inputs; `Poly + Paper` remains single-input (exception).
+- **Auto-Logging and Feedback System (2026-02-17):**
+  - Unified Calculator automatically logs every valid calculation to the `calculations` table (debounced 1s).
+  - Duplicate prevention implemented using `answerHash` metadata to avoid spamming the database.
+  - Optional Right (Green) / Wrong (Red) feedback buttons allow users to mark result accuracy.
+  - Feedback is stored in a separate `feedback` table with full context snapshots (inputs, results, metadata).
+  - System is optimized for mobile, tablet, and desktop viewports.
+  - Feature is gated by `NEXT_PUBLIC_ENABLE_AUTO_FEEDBACK` environment variable.
 - **Recent Fixes:**
   - Hydration mismatch resolved in `layout.tsx`.
   - Mobile selector visibility fixed with `ChevronDown`.

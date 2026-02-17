@@ -20,7 +20,8 @@
 ## Backend (Convex)
 
 - [convex/schema.ts](convex/schema.ts): Database schema: `users`, `fabrication`, `calculations`, `competitor_rates`, `work_instructions`.
-- [convex/calculations.ts](convex/calculations.ts): Save/list mutations for calculation history (auth-gated).
+- [convex/calculations.ts](convex/calculations.ts): Save/autoSave/list mutations for calculation history (auth-gated).
+- [convex/feedback.ts](convex/feedback.ts): Submit and list user feedback for calculations.
 - [convex/competitor_rates.ts](convex/competitor_rates.ts): Add/list mutations for competitor pricing.
 - [convex/instructions.ts](convex/instructions.ts): Create/list/updateStatus for work instructions.
 - [convex/fabrication.ts](convex/fabrication.ts): List query for imported fabrication data.

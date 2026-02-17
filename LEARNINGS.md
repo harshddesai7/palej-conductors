@@ -1,6 +1,9 @@
 # Learnings
 
-## Staging → Production Sync Script (2026-02-16)
+## Backend Auto-Logging & Feedback (2026-02-17)
+- **Duplicate Prevention**: When implementing automatic logging on every recalculation, it's critical to use a content-based hash (`answerHash`) to prevent duplicate records from the same user session. Filtering by hash + userId in the mutation ensures database hygiene.
+- **Feedback snapshots**: Storing full input/output snapshots in the feedback record itself, rather than just referencing the calculation ID, provides an immutable audit trail even if calculation logic changes later.
+- **Feature Flag Gating**: For staging-first rollouts sharing a production backend, frontend feature flags (`NEXT_PUBLIC_*`) allow safe activation and validation without affecting live users until ready.
 - **Context**: Staging and production are separate Git repositories with potentially diverged histories.
 - **Solution**: Created automated sync script (`scripts/sync-staging-to-prod.ps1` / `.sh`) that:
   - Verifies staging repo context
