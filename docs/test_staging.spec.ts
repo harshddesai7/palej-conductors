@@ -21,11 +21,11 @@ test.describe('Staging Frontend Audit', () => {
     await page.waitForURL('**/dashboard/**', { timeout: 10000 });
   });
 
-  test('Sidebar shows only 3 calculators', async ({ page }) => {
+  test('Sidebar shows only 2 calculators', async ({ page }) => {
     await page.waitForLoadState('networkidle');
     
-    const expectedItems = ['Unified Calculator', 'Factor Calculator', 'LME Copper'];
-    const unexpectedItems = ['Bare Calculator', 'Fabrication List', 'Competitor Rates', 'Work Instructions', 'Die Calculator'];
+    const expectedItems = ['Unified Calculator', 'Factor Calculator'];
+    const unexpectedItems = ['LME Copper', 'Bare Calculator', 'Fabrication List', 'Competitor Rates', 'Work Instructions', 'Die Calculator'];
     
     // Check expected items exist in sidebar
     for (const item of expectedItems) {
