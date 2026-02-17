@@ -18,9 +18,9 @@ export const CONSTANTS = {
     DEFAULT_SPEED_M_HR: 256,
   },
   INSULATION_TYPES: [
-    { name: "Dfg 225 yarn", factorAlu: 1.50, factorCu: 1.70, defaultThickness: 0.50 },
-    { name: "Dfg 450 yarn", factorAlu: 1.50, factorCu: 1.70, defaultThickness: 0.50 },
-    { name: "Dfg 900 yarn", factorAlu: 1.50, factorCu: 1.70, defaultThickness: 0.50 },
+    { name: "Dfg 225 yarn", factorAlu: 1.45, factorCu: 1.45, defaultThickness: 0.50 },
+    { name: "Dfg 450 yarn", factorAlu: 1.45, factorCu: 1.45, defaultThickness: 0.50 },
+    { name: "Dfg 900 yarn", factorAlu: 1.45, factorCu: 1.45, defaultThickness: 0.50 },
     { name: "Polyester", factorAlu: 1.40, factorCu: 1.30, defaultThicknessStrip: 0.50, defaultThicknessWire: 0.40 },
     {
       name: "Poly + Dfg 225",
