@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
     Calculator,
-    Settings,
     ChevronRight,
     Zap,
     X
@@ -86,20 +85,6 @@ export function Sidebar() {
                         );
                     })}
                 </nav>
-
-                <div className="p-4 border-t border-white/10">
-                    <Link
-                        href="/dashboard/settings"
-                        title={isCollapsed ? "Settings" : undefined}
-                        className={cn(
-                            "flex items-center gap-3 px-3 py-2.5 text-slate-500 hover:text-slate-900 hover:bg-white/50 rounded-xl transition-all",
-                            isCollapsed && "lg:justify-center lg:px-0 lg:gap-0"
-                        )}
-                    >
-                        <Settings className="w-5 h-5 shrink-0" />
-                        {!isCollapsed && <span className="text-sm font-medium">Settings</span>}
-                    </Link>
-                </div>
             </div>
         </>
     );

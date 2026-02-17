@@ -20,6 +20,7 @@ Before reading the prompt, you MUST verify:
 1.  **Clock**: What is the current date & time?
 2.  **Sandbox**: Are you in Staging vs Prod? (`CONVEX_DEPLOYMENT`) -> **"The Sandbox First" Rule**.
     - *Rule*: **NEVER** run `npx convex deploy` (or any deployment) without confirming the target.
+    - *Rule*: **Staging → Production Sync**: After verifying changes on staging, use `scripts/sync-staging-to-prod.ps1` (PowerShell) or `scripts/sync-staging-to-prod.sh` (Bash) to sync to production. See `scripts/README.md` for usage.
 3.  **Wallet**: If using APIs, are credits/keys valid? -> **"The Wallet Check" Rule**.
     - *Rule*: Verify account status/credits via `ENV_VARS.md` (if available) as the *first* debugging step.
 4.  **Tools**: Is there a Skill/Tool for this? -> **"The Tool Shed" Rule**.
@@ -58,6 +59,7 @@ Before reading the prompt, you MUST verify:
     5.  **Visualize & Verify**:
         - **Mental Sandbox**: Visualize the user using your changes. Walk through the UI flow step-by-step. **Use `/v` for deep pre-visualization.**
         - **Deployment**: The plan MUST include steps to verify the deployment and ensure no regressions.
+        - **Staging → Production**: If deploying to production, use `scripts/sync-staging-to-prod.ps1` after staging verification. Never deploy directly to production without staging validation.
 
 ### 5. Execution
 - **Goal**: Implement the plan.
