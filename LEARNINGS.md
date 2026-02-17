@@ -1,5 +1,12 @@
 # Learnings
 
+## Per-Feature Storage Architecture (2026-02-17)
+- **Database Splitting**: When multiple features share a monolithic table, splitting into feature-specific tables (`unified_calculations`, `factor_calculations`) provides better isolation, scalability, and query performance. Each feature can evolve independently without schema conflicts.
+- **Auto-Save UX**: Visible status indicators ("Saving...", "Saved", "Error saving data") provide immediate feedback and build user trust. Debouncing (1s) prevents excessive API calls while maintaining responsiveness.
+- **Timestamp Indexing**: Adding `by_timestamp` indexes enables efficient newest-first queries without full table scans. Critical for admin-wide viewing interfaces.
+- **Backward Compatibility**: When migrating schemas, making new required fields optional in legacy tables (`saveMode: v.optional()`) allows gradual migration without breaking existing data.
+- **Answer Hash Deduplication**: Using content-based hashes (`answerHash`) prevents duplicate saves from rapid user interactions while preserving intentional re-saves with different inputs.
+
 ## Backend Auto-Logging & Feedback (2026-02-17)
 - **Duplicate Prevention**: When implementing automatic logging on every recalculation, it's critical to use a content-based hash (`answerHash`) to prevent duplicate records from the same user session. Filtering by hash + userId in the mutation ensures database hygiene.
 - **Feedback snapshots**: Storing full input/output snapshots in the feedback record itself, rather than just referencing the calculation ID, provides an immutable audit trail even if calculation logic changes later.

@@ -8,9 +8,10 @@
 
 - [src/lib/calculators/engine.ts](src/lib/calculators/engine.ts): Core math logic for all calculators. Supports kV-specific factors (Poly+DFG 8kV/18kV), material-restricted presets, and combined-factor dual-layer.
 - [src/app/dashboard](src/app/dashboard): Authenticated calculator pages.
-- [src/app/dashboard/calculator/page.tsx](src/app/dashboard/calculator/page.tsx): Unified Calculator with Insulated/Bare mode toggle, insulation presets & save.
+- [src/app/dashboard/calculator/page.tsx](src/app/dashboard/calculator/page.tsx): Unified Calculator with Insulated/Bare mode toggle, insulation presets, auto-save, and save status display.
 - [src/app/dashboard/bare/page.tsx](src/app/dashboard/bare/page.tsx): Redirects to `/dashboard/calculator?mode=bare` (Bare merged into Unified).
-- [src/app/dashboard/factor/page.tsx](src/app/dashboard/factor/page.tsx): Factor Calculator with save.
+- [src/app/dashboard/factor/page.tsx](src/app/dashboard/factor/page.tsx): Factor Calculator with auto-save and save status display.
+- [src/app/dashboard/search/page.tsx](src/app/dashboard/search/page.tsx): Search Database page with Unified/Factor database selector and newest-first results.
 - [src/app/dashboard/lme/page.tsx](src/app/dashboard/lme/page.tsx): LME Copper Pricing with date field & save.
 - [src/app/dashboard/fabrication/page.tsx](src/app/dashboard/fabrication/page.tsx): Fabrication List dashboard (139 imported logs).
 - [src/app/dashboard/competitors/page.tsx](src/app/dashboard/competitors/page.tsx): Competitor Rates market intelligence module.
@@ -19,16 +20,18 @@
 
 ## Backend (Convex)
 
-- [convex/schema.ts](convex/schema.ts): Database schema: `users`, `fabrication`, `calculations`, `competitor_rates`, `work_instructions`.
-- [convex/calculations.ts](convex/calculations.ts): Save/autoSave/list mutations for calculation history (auth-gated).
-- [convex/feedback.ts](convex/feedback.ts): Submit and list user feedback for calculations.
+- [convex/schema.ts](convex/schema.ts): Database schema: `users`, `fabrication`, `calculations` (legacy), `unified_calculations`, `factor_calculations`, `feedback`, `competitor_rates`, `work_instructions`.
+- [convex/unifiedCalculations.ts](convex/unifiedCalculations.ts): Save/autoSave/list/listAll mutations for Unified Calculator (Insulated & Bare mode) with duplicate prevention.
+- [convex/factorCalculations.ts](convex/factorCalculations.ts): Save/autoSave/list/listAll mutations for Factor Calculator with duplicate prevention.
+- [convex/calculations.ts](convex/calculations.ts): Legacy save/autoSave/list mutations (retained for backward compatibility).
+- [convex/feedback.ts](convex/feedback.ts): Submit and list user feedback for Unified Calculator calculations (references `unified_calculations`).
 - [convex/competitor_rates.ts](convex/competitor_rates.ts): Add/list mutations for competitor pricing.
 - [convex/instructions.ts](convex/instructions.ts): Create/list/updateStatus for work instructions.
 - [convex/fabrication.ts](convex/fabrication.ts): List query for imported fabrication data.
 
 ## Components
 
-- [src/components/Sidebar.tsx](src/components/Sidebar.tsx): Sidebar navigation (8 items).
+- [src/components/Sidebar.tsx](src/components/Sidebar.tsx): Sidebar navigation (Unified Calculator, Factor Calculator, Search Database).
 
 ## Documentation
 

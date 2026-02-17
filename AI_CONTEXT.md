@@ -93,13 +93,20 @@
   - Factors updated per image + Excel top-1 (DFG 1.50/1.70, Poly 1.40/1.30, Cotton 0.70, Enamel+DFG 0.85).
   - New presets: Poly+Cotton (1.30), Poly+Paper (0.95, both materials).
   - Material-restricted presets filtered; dual-layer uses combined factor + summed covering.
-- **Auto-Logging and Feedback System (2026-02-17):**
-  - Unified Calculator automatically logs every valid calculation to the `calculations` table (debounced 1s).
-  - Duplicate prevention implemented using `answerHash` metadata to avoid spamming the database.
-  - Optional Right (Green) / Wrong (Red) feedback buttons allow users to mark result accuracy.
-  - Feedback is stored in a separate `feedback` table with full context snapshots (inputs, results, metadata).
-  - System is optimized for mobile, tablet, and desktop viewports.
-  - Feature is gated by `NEXT_PUBLIC_ENABLE_AUTO_FEEDBACK` environment variable.
+- **Per-Feature Storage Architecture (2026-02-17):**
+  - **Database Split**: Replaced monolithic `calculations` table with feature-specific tables:
+    - `unified_calculations`: Stores Unified Calculator (Insulated & Bare mode) results
+    - `factor_calculations`: Stores Factor Calculator results
+  - **Auto-Save**: Both calculators automatically save every valid calculation (debounced 1s) with visible status indicators:
+    - "Saving..." (blue) → "Saved" (green) or "Error saving data" (red)
+  - **Search Database**: New sidebar tab `/dashboard/search` allows admin-wide viewing of all saved calculations:
+    - Database selector: Unified Calculator Database vs Factor Calculator Database
+    - Newest-first ordering by timestamp
+    - Search/filter functionality
+  - **Duplicate Prevention**: Uses `answerHash` metadata to prevent duplicate saves per user.
+  - **Feedback System**: Optional Right (Green) / Wrong (Red) buttons stored in `feedback` table (references `unified_calculations`).
+  - **Architecture Rule**: Each left-tab feature uses its own database table with auto-save and timestamps.
+  - **Backward Compatibility**: Old `calculations` table retained temporarily with optional `saveMode` field.
 - **Recent Fixes:**
   - Hydration mismatch resolved in `layout.tsx`.
   - Mobile selector visibility fixed with `ChevronDown`.

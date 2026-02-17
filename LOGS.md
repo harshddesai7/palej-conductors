@@ -44,6 +44,32 @@
 - **Auth Setup**: Identified requirement for manual `npx convex dev` to initialize `JWT_PRIVATE_KEY` on the server.
 - **Cleanup**: Retained math verification script in `docs/` for audit trail.
 
+## [2026-02-17] Phase 8: Search Database + Per-Feature Storage Architecture
+- **Architecture Change**: Split monolithic `calculations` table into feature-specific tables (`unified_calculations`, `factor_calculations`).
+- **New Feature**: Added "Search Database" tab in sidebar with route `/dashboard/search`.
+- **Auto-Save Status**: Implemented visible save status indicators ("Saving...", "Saved", "Error saving data") for both Unified and Factor calculators.
+- **Unified Calculator**: 
+  - Migrated to `unifiedCalculations` API with auto-save on every valid calculation.
+  - Added save status display in results panel.
+  - Maintains backward compatibility with feedback system.
+- **Factor Calculator**: 
+  - Migrated to `factorCalculations` API.
+  - Added auto-save functionality with debounced trigger (1s delay).
+  - Added save status display.
+- **Search Database UI**: 
+  - Built admin-wide viewing interface with database selector (Unified vs Factor).
+  - Displays newest-first results with timestamps.
+  - Includes search/filter functionality.
+- **Backend Changes**:
+  - Created `convex/unifiedCalculations.ts` with `save`, `autoSave`, `list`, `listAll` functions.
+  - Created `convex/factorCalculations.ts` with `save`, `autoSave`, `list`, `listAll` functions.
+  - Updated `convex/schema.ts` with new tables and indexes (`by_timestamp` for newest-first ordering).
+  - Updated `convex/feedback.ts` to reference `unified_calculations` table.
+  - Made `saveMode` optional in old `calculations` table for backward compatibility.
+- **Testing**: Updated Playwright tests to include Search Database navigation and save status verification.
+- **Deployment**: Deployed to staging first, then synced to production. Convex schema deployed successfully.
+- **Architecture Rule**: Each left-tab feature now uses its own database table with auto-save and timestamps.
+
 ## [2026-02-15] - Phase 5: Frontend Deep Audit Complete
 - **Status**: 100% Verified
 - **Scope**: Unified Calculator (52 permutations)
