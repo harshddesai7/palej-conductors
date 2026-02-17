@@ -1,5 +1,8 @@
 # Learnings
 
+## Factor Calculator - Zero Percentage Edge Case (2026-02-17)
+- **Validation vs UX**: Requiring `percentageIncrease > 0` prevented any result when user had 0%. For reverse-engineering, 0% yields factor 0 (valid). Use `>= 0` to allow edge case and show result.
+
 ## Factor Calculator Decimal Input (2026-02-17)
 - **Decimal Input UX**: For numeric fields that accept values like 0.10, 0.50, 1.5, 2.2 mm, explicitly set `step="0.01"` (not just 0.001) and `inputMode="decimal"` for mobile. Add `min`/`max` and `placeholder` to guide users on valid range.
 - **Controlled Inputs**: When `value` is a number, React normalizes display (0.50 shows as 0.5). The value is correct; step/min/max ensure browser validation allows the range.

@@ -44,6 +44,12 @@
 - **Auth Setup**: Identified requirement for manual `npx convex dev` to initialize `JWT_PRIVATE_KEY` on the server.
 - **Cleanup**: Retained math verification script in `docs/` for audit trail.
 
+## [2026-02-17] Factor Calculator - Allow 0% for Calculation
+- **Issue**: Factor Calculator showed empty "CALCULATED FACTOR" when percentage increase was 0.
+- **Root Cause**: Condition required `percentageIncrease > 0`, blocking calculation when user had 0%.
+- **Fix**: Changed to `percentageIncrease >= 0` in `src/app/dashboard/factor/page.tsx`. When % is 0, factor correctly returns 0 (no insulation effect).
+- **Deployment**: Pushed to staging and production.
+
 ## [2026-02-17] Factor Calculator - Covering Field Decimal Fix
 - **Issue**: Factor Calculator Covering (mm) field was not properly accepting decimal values like 0.50.
 - **Root Cause**: Input needed explicit step, min, max, and inputMode for decimal support (insulation thickness range 0.10 mm to 2.2 mm).
