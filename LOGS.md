@@ -44,6 +44,15 @@
 - **Auth Setup**: Identified requirement for manual `npx convex dev` to initialize `JWT_PRIVATE_KEY` on the server.
 - **Cleanup**: Retained math verification script in `docs/` for audit trail.
 
+## [2026-02-17] Factor Calculator - Covering Field Decimal Fix
+- **Issue**: Factor Calculator Covering (mm) field was not properly accepting decimal values like 0.50.
+- **Root Cause**: Input needed explicit step, min, max, and inputMode for decimal support (insulation thickness range 0.10 mm to 2.2 mm).
+- **Fix**: Updated `src/app/dashboard/factor/page.tsx`:
+  - Covering field: `step="0.01"`, `min={0}`, `max={3}`, `placeholder="0.10 - 2.2"`
+  - Added `inputMode="decimal"` for mobile decimal keyboard
+  - Typed InputGroup props (step, min, max, placeholder) for flexibility
+- **Deployment**: Pushed to staging and production.
+
 ## [2026-02-17] Phase 9: Enhanced Search Database Table
 - **Comprehensive Data Display**: Added all calculation fields to Search Database table:
   - Unified Calculator: 16 columns (Timestamp, Material, Shape, Mode, Size, Insulation, kV, Insulation Thickness, Factor, % Increase, Bare Wt, Total Wt, Meters/Spool, Production, Hours, Save Mode)
