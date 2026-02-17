@@ -1,5 +1,16 @@
 # Learnings
 
+## Staging → Production Sync Script (2026-02-16)
+- **Context**: Staging and production are separate Git repositories with potentially diverged histories.
+- **Solution**: Created automated sync script (`scripts/sync-staging-to-prod.ps1` / `.sh`) that:
+  - Verifies staging repo context
+  - Fetches production state
+  - Shows commit diff
+  - Uses force push (`--force`) since repos are separate
+- **Workflow**: Develop → Test on Staging → Verify → Sync to Production → Verify Production
+- **Safety**: Script includes dry-run mode, confirmation prompts, and error handling at each step.
+- **Note**: Force push is safe here because staging is the source of truth for new features, and production is a deployment target.
+
 > **Protected File**: This file logs tricky bugs, architectural decisions, and key insights discovered during development.
 > 
 > **Rule**: NEVER DELETE. NEVER MERGE. Only UPDATE/APPEND.
