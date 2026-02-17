@@ -7,6 +7,10 @@ export const save = mutation({
         type: v.string(),
         material: v.optional(v.string()),
         shape: v.optional(v.string()),
+        mode: v.optional(v.string()),
+        insulationType: v.optional(v.string()),
+        kV: v.optional(v.string()),
+        answerHash: v.optional(v.string()),
         inputs: v.any(),
         results: v.any(),
     },
@@ -17,6 +21,43 @@ export const save = mutation({
         return await ctx.db.insert("calculations", {
             ...args,
             userId,
+            saveMode: "MANUAL",
+            timestamp: Date.now(),
+        });
+    },
+});
+
+export const autoSave = mutation({
+    args: {
+        type: v.string(),
+        material: v.optional(v.string()),
+        shape: v.optional(v.string()),
+        mode: v.optional(v.string()),
+        insulationType: v.optional(v.string()),
+        kV: v.optional(v.string()),
+        answerHash: v.string(),
+        inputs: v.any(),
+        results: v.any(),
+    },
+    handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx);
+        if (!userId) throw new Error("Unauthorized");
+
+        // Duplicate prevention: check if this hash already exists for this user
+        const existing = await ctx.db
+            .query("calculations")
+            .withIndex("by_answerHash", (q) => q.eq("answerHash", args.answerHash))
+            .filter((q) => q.eq(q.field("userId"), userId))
+            .first();
+
+        if (existing) {
+            return existing._id;
+        }
+
+        return await ctx.db.insert("calculations", {
+            ...args,
+            userId,
+            saveMode: "AUTO",
             timestamp: Date.now(),
         });
     },

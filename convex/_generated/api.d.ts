@@ -12,6 +12,7 @@ import type * as auth from "../auth.js";
 import type * as calculations from "../calculations.js";
 import type * as competitor_rates from "../competitor_rates.js";
 import type * as fabrication from "../fabrication.js";
+import type * as feedback from "../feedback.js";
 import type * as http from "../http.js";
 import type * as instructions from "../instructions.js";
 import type * as users from "../users.js";
@@ -27,6 +28,7 @@ declare const fullApi: ApiFromModules<{
   calculations: typeof calculations;
   competitor_rates: typeof competitor_rates;
   fabrication: typeof fabrication;
+  feedback: typeof feedback;
   http: typeof http;
   instructions: typeof instructions;
   users: typeof users;

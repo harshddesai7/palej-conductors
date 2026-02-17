@@ -27,10 +27,27 @@ export default defineSchema({
         type: v.string(), // "Unified", "Bare", "Factor", "LME"
         material: v.optional(v.string()),
         shape: v.optional(v.string()),
+        mode: v.optional(v.string()), // "INSULATED", "BARE"
+        insulationType: v.optional(v.string()),
+        kV: v.optional(v.string()),
+        saveMode: v.string(), // "MANUAL", "AUTO"
+        answerHash: v.optional(v.string()), // For duplicate prevention
         inputs: v.any(),
         results: v.any(),
         timestamp: v.number(),
-    }).index("by_userId", ["userId"]),
+    }).index("by_userId", ["userId"])
+      .index("by_answerHash", ["answerHash"]),
+    feedback: defineTable({
+        userId: v.string(),
+        calculationId: v.id("calculations"),
+        verdict: v.string(), // "RIGHT", "WRONG"
+        inputsSnapshot: v.any(),
+        selectionSnapshot: v.any(),
+        resultsSnapshot: v.any(),
+        timestamp: v.number(),
+    }).index("by_userId", ["userId"])
+      .index("by_calculationId", ["calculationId"])
+      .index("by_verdict", ["verdict"]),
     competitor_rates: defineTable({
         competitorName: v.string(),
         material: v.string(), // "ALUMINIUM", "COPPER"

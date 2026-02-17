@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useMutation } from "convex/react";
-import { Loader2 } from "lucide-react";
+import { Loader2, ThumbsUp, ThumbsDown, CheckCircle2 } from "lucide-react";
 import { api } from "../../../../convex/_generated/api";
+import { Id } from "../../../../convex/_generated/dataModel";
 import {
     calculateStripInsulation,
     calculateWireInsulation,
@@ -25,7 +26,15 @@ import { cn } from "@/lib/utils";
 function UnifiedCalculatorContent() {
     const searchParams = useSearchParams();
     const saveCalculation = useMutation(api.calculations.save);
+    const autoSaveCalculation = useMutation(api.calculations.autoSave);
+    const submitFeedback = useMutation(api.feedback.submitFeedback);
     const [isSaving, setIsSaving] = useState(false);
+    const [latestCalculationId, setLatestCalculationId] = useState<Id<"calculations"> | null>(null);
+    const [feedbackStatus, setFeedbackStatus] = useState<"IDLE" | "SUBMITTING" | "DONE">("IDLE");
+    const [verdict, setVerdict] = useState<"RIGHT" | "WRONG" | null>(null);
+
+    // Feature Flag
+    const isFeedbackEnabled = process.env.NEXT_PUBLIC_ENABLE_AUTO_FEEDBACK === "true";
 
     // 0. Mode: Insulated (default) or Bare
     const [mode, setMode] = useState<"INSULATED" | "BARE">("INSULATED");
@@ -164,6 +173,45 @@ function UnifiedCalculatorContent() {
         }
     }, [mode, inputs, material, shape, selectedType, isDualLayerSelected]);
 
+    // 4c. Auto-save Answer Hash Generation
+    const answerHash = useMemo(() => {
+        if (mode === "BARE") {
+            if (!bareResults) return null;
+            return `BARE|${material}|${shape}|${inputs.width}|${inputs.thickness}|${inputs.dia}|${inputs.length}|${bareResults.bareArea.toFixed(4)}|${bareResults.weight.toFixed(3)}`;
+        }
+        if (!results) return null;
+        return `UNIFIED|${material}|${shape}|${selectedType}|${selectedKV}|${inputs.width}|${inputs.thickness}|${inputs.dia}|${inputs.insulationThickness}|${inputs.polyCov}|${inputs.dfgCov}|${inputs.factor}|${results.percentIncrease.toFixed(4)}|${results.bareWtReqd.toFixed(4)}`;
+    }, [mode, material, shape, selectedType, selectedKV, inputs, results, bareResults]);
+
+    // 4d. Auto-save Debounced Trigger
+    useEffect(() => {
+        if (!answerHash || !isFeedbackEnabled) return;
+
+        const timeout = setTimeout(async () => {
+            try {
+                const id = await autoSaveCalculation({
+                    type: mode === "BARE" ? "Bare" : "Unified",
+                    material,
+                    shape,
+                    mode,
+                    insulationType: selectedType,
+                    kV: selectedKV,
+                    answerHash,
+                    inputs: { ...inputs },
+                    results: mode === "BARE" ? bareResults : results,
+                });
+                setLatestCalculationId(id);
+                // Reset feedback state if the answer changes
+                setFeedbackStatus("IDLE");
+                setVerdict(null);
+            } catch (err) {
+                console.error("Auto-save failed:", err);
+            }
+        }, 1000); // 1s debounce
+
+        return () => clearTimeout(timeout);
+    }, [answerHash, isFeedbackEnabled, mode, material, shape, selectedType, selectedKV, inputs, results, bareResults, autoSaveCalculation]);
+
     // 4b. Auto-update preset defaults when material/shape/kV changes (Insulated only)
     useEffect(() => {
         if (mode === "BARE" || selectedType === "Manual") return;
@@ -219,6 +267,26 @@ function UnifiedCalculatorContent() {
         }
     };
 
+    const handleFeedback = async (v: "RIGHT" | "WRONG") => {
+        if (!latestCalculationId) return;
+        setVerdict(v);
+        setFeedbackStatus("SUBMITTING");
+        try {
+            await submitFeedback({
+                calculationId: latestCalculationId,
+                verdict: v,
+                inputsSnapshot: { ...inputs },
+                selectionSnapshot: { material, shape, mode, selectedType, selectedKV },
+                resultsSnapshot: mode === "BARE" ? { ...bareResults } : { ...results },
+            });
+            setFeedbackStatus("DONE");
+        } catch (err) {
+            console.error("Feedback submission failed:", err);
+            setFeedbackStatus("IDLE");
+            setVerdict(null);
+        }
+    };
+
     const handleSave = async () => {
         setIsSaving(true);
         try {
@@ -227,6 +295,9 @@ function UnifiedCalculatorContent() {
                     type: "Bare",
                     material,
                     shape,
+                    mode,
+                    insulationType: "Bare",
+                    answerHash: answerHash || undefined,
                     inputs: {
                         width: Number(inputs.width) || 0,
                         thickness: Number(inputs.thickness) || 0,
@@ -242,6 +313,10 @@ function UnifiedCalculatorContent() {
                     type: "Unified",
                     material,
                     shape,
+                    mode,
+                    insulationType: selectedType,
+                    kV: selectedKV,
+                    answerHash: answerHash || undefined,
                     inputs: {
                         width: Number(inputs.width) || 0,
                         thickness: Number(inputs.thickness) || 0,
@@ -565,6 +640,50 @@ function UnifiedCalculatorContent() {
                                 </>
                             )}
                         </div>
+
+                        {/* Feedback Area */}
+                        {isFeedbackEnabled && latestCalculationId && (
+                            <div className="mt-8 pt-6 border-t border-white/10 space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Is this result correct?</span>
+                                    {feedbackStatus === "DONE" && (
+                                        <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 animate-in fade-in zoom-in duration-300">
+                                            <CheckCircle2 className="w-3 h-3" /> Received
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button
+                                        onClick={() => handleFeedback("RIGHT")}
+                                        disabled={feedbackStatus !== "IDLE"}
+                                        className={cn(
+                                            "flex items-center justify-center gap-2 py-3 rounded-2xl border transition-all text-xs font-bold",
+                                            feedbackStatus === "DONE" && verdict === "RIGHT" 
+                                                ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
+                                                : feedbackStatus === "DONE"
+                                                ? "opacity-30 border-white/10 text-white/50 grayscale"
+                                                : "bg-white/5 border-white/10 hover:bg-emerald-500/10 hover:border-emerald-500/50 text-white"
+                                        )}
+                                    >
+                                        <ThumbsUp className="w-4 h-4" /> Right
+                                    </button>
+                                    <button
+                                        onClick={() => handleFeedback("WRONG")}
+                                        disabled={feedbackStatus !== "IDLE"}
+                                        className={cn(
+                                            "flex items-center justify-center gap-2 py-3 rounded-2xl border transition-all text-xs font-bold",
+                                            feedbackStatus === "DONE" && verdict === "WRONG"
+                                                ? "bg-rose-500/20 border-rose-500 text-rose-400"
+                                                : feedbackStatus === "DONE"
+                                                ? "opacity-30 border-white/10 text-white/50 grayscale"
+                                                : "bg-white/5 border-white/10 hover:bg-rose-500/10 hover:border-rose-500/50 text-white"
+                                        )}
+                                    >
+                                        <ThumbsDown className="w-4 h-4" /> Wrong
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="glass p-6 rounded-2xl bg-indigo-50/50 border-indigo-100">
