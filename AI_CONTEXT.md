@@ -101,8 +101,13 @@
     - "Saving..." (blue) → "Saved" (green) or "Error saving data" (red)
   - **Search Database**: New sidebar tab `/dashboard/search` allows admin-wide viewing of all saved calculations:
     - Database selector: Unified Calculator Database vs Factor Calculator Database
-    - Newest-first ordering by timestamp
-    - Search/filter functionality
+    - Comprehensive table display: Shows all calculation fields (size, insulation, percentage, production metrics)
+    - Multi-column sorting: Sort by timestamp, size, percentage, material, insulation type, etc. with visual indicators
+    - Frozen timestamp column: First column stays visible during vertical scroll
+    - Reduced text size and improved density for better data visibility
+    - Horizontal and vertical scrolling with proper overflow handling
+    - Newest-first ordering by timestamp (default)
+    - Enhanced search/filter functionality across inputs and results
   - **Duplicate Prevention**: Uses `answerHash` metadata to prevent duplicate saves per user.
   - **Feedback System**: Optional Right (Green) / Wrong (Red) buttons stored in `feedback` table (references `unified_calculations`).
   - **Architecture Rule**: Each left-tab feature uses its own database table with auto-save and timestamps.

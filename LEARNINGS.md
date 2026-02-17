@@ -1,5 +1,12 @@
 # Learnings
 
+## Enhanced Search Database Table (2026-02-17)
+- **Frozen Column Pattern**: Using CSS `position: sticky` with `left: 0` and appropriate `z-index` creates frozen columns that stay visible during horizontal scroll. Critical for wide tables where key identifiers (like timestamps) must remain visible.
+- **Multi-Column Sorting UX**: Clickable column headers with visual indicators (up/down arrows) provide intuitive sorting. Using `useMemo` for sorted data prevents unnecessary recalculations on every render.
+- **Data Density Optimization**: Reducing text sizes (`text-xs`, `text-[9px]`) and padding (`px-3 py-2`) allows displaying more data without overwhelming the UI. Balance readability with information density.
+- **Size Column Formatting**: Combining dimensions with calculated values (e.g., "10×5 (50.00 mm²)") provides context at a glance. Format based on shape type (Strip vs Wire) for clarity.
+- **Scrollable Container Pattern**: Using `max-h-[calc(100vh-400px)]` with `overflow-x-auto overflow-y-auto` creates a contained scrollable area that respects viewport height while allowing horizontal overflow for wide tables.
+
 ## Per-Feature Storage Architecture (2026-02-17)
 - **Database Splitting**: When multiple features share a monolithic table, splitting into feature-specific tables (`unified_calculations`, `factor_calculations`) provides better isolation, scalability, and query performance. Each feature can evolve independently without schema conflicts.
 - **Auto-Save UX**: Visible status indicators ("Saving...", "Saved", "Error saving data") provide immediate feedback and build user trust. Debouncing (1s) prevents excessive API calls while maintaining responsiveness.

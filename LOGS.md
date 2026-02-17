@@ -44,6 +44,22 @@
 - **Auth Setup**: Identified requirement for manual `npx convex dev` to initialize `JWT_PRIVATE_KEY` on the server.
 - **Cleanup**: Retained math verification script in `docs/` for audit trail.
 
+## [2026-02-17] Phase 9: Enhanced Search Database Table
+- **Comprehensive Data Display**: Added all calculation fields to Search Database table:
+  - Unified Calculator: 16 columns (Timestamp, Material, Shape, Mode, Size, Insulation, kV, Insulation Thickness, Factor, % Increase, Bare Wt, Total Wt, Meters/Spool, Production, Hours, Save Mode)
+  - Factor Calculator: 7 columns (Timestamp, Material, Size, Covering, % Increase, Factor, Save Mode)
+- **Size Column Formatting**: Displays dimensions + bare area:
+  - Strip: `W×T (bareArea mm²)` format
+  - Wire: `D (bareArea mm²)` format
+- **Multi-Column Sorting**: Implemented sorting for all sortable columns with visual indicators (ArrowUp, ArrowDown, ArrowUpDown icons)
+- **Frozen Timestamp Column**: First column stays visible during vertical scroll using CSS `position: sticky`
+- **Reduced Text Size**: Changed from `text-sm` to `text-xs` for cells, `text-[9px]` for headers
+- **Improved Density**: Reduced padding from `px-6 py-4` to `px-3 py-2`
+- **Scrollable Container**: Added horizontal and vertical scrolling with `max-h-[calc(100vh-400px)]`
+- **Data Formatting**: Proper formatting for percentages (%), weights (kg), lengths (m), production rates (kg/hr), times (hrs)
+- **Enhanced Search**: Now searches through both inputs and results data
+- **Default Sort**: Newest first (timestamp descending) maintained
+
 ## [2026-02-17] Phase 8: Search Database + Per-Feature Storage Architecture
 - **Architecture Change**: Split monolithic `calculations` table into feature-specific tables (`unified_calculations`, `factor_calculations`).
 - **New Feature**: Added "Search Database" tab in sidebar with route `/dashboard/search`.

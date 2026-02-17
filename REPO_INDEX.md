@@ -11,7 +11,7 @@
 - [src/app/dashboard/calculator/page.tsx](src/app/dashboard/calculator/page.tsx): Unified Calculator with Insulated/Bare mode toggle, insulation presets, auto-save, and save status display.
 - [src/app/dashboard/bare/page.tsx](src/app/dashboard/bare/page.tsx): Redirects to `/dashboard/calculator?mode=bare` (Bare merged into Unified).
 - [src/app/dashboard/factor/page.tsx](src/app/dashboard/factor/page.tsx): Factor Calculator with auto-save and save status display.
-- [src/app/dashboard/search/page.tsx](src/app/dashboard/search/page.tsx): Search Database page with Unified/Factor database selector and newest-first results.
+- [src/app/dashboard/search/page.tsx](src/app/dashboard/search/page.tsx): Search Database page with comprehensive table display, multi-column sorting, frozen timestamp column, and scrollable data view.
 - [src/app/dashboard/lme/page.tsx](src/app/dashboard/lme/page.tsx): LME Copper Pricing with date field & save.
 - [src/app/dashboard/fabrication/page.tsx](src/app/dashboard/fabrication/page.tsx): Fabrication List dashboard (139 imported logs).
 - [src/app/dashboard/competitors/page.tsx](src/app/dashboard/competitors/page.tsx): Competitor Rates market intelligence module.
