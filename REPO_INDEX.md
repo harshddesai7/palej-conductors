@@ -43,6 +43,12 @@
 - [Phase1_Master_Consolidated_Unique.xlsx](Phase1_Master_Consolidated_Unique.xlsx): Final unique-only version per tab (one best row per size key based on green mark, weight, scrap-rate priority).
 - [Phase1_Master_Consolidated_Unique_Clear.xlsx](Phase1_Master_Consolidated_Unique_Clear.xlsx): Readability-cleaned unique workbook with duplicate marker columns removed and top-3 factor highlighting preserved.
 
+## Scripts
+
+- [scripts/sync-staging-to-prod.ps1](scripts/sync-staging-to-prod.ps1): PowerShell script to sync staging changes to production.
+- [scripts/sync-staging-to-prod.sh](scripts/sync-staging-to-prod.sh): Bash script to sync staging changes to production.
+- [scripts/README.md](scripts/README.md): Documentation for sync scripts.
+
 ## Configuration & Workflows
 
 - [dev.ps1](dev.ps1): Helper script to run `npm run dev` from project directory (fixes Tailwind resolution when cwd is wrong).

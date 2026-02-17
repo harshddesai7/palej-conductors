@@ -204,6 +204,21 @@
   - `unique_check True` across all non-empty tabs.
   - Opened `Phase1_Master_Consolidated_Unique.xlsx` in Microsoft Excel.
 
+## [2026-02-16] - Production Deployment (Staging → Production Sync)
+- **Goal**: Deploy verified staging changes to production.
+- **Method**: Created sync script + manual force push.
+- **Sync Script**: `scripts/sync-staging-to-prod.ps1` and `.sh` - automated staging→production sync with safety checks.
+- **Deployed**: Commit `9ecaa51` → Production (`palej-conductors` repo).
+- **Changes Deployed**:
+  - Factor Calculator fix (dash display)
+  - Unified Calculator Bare mode
+  - Sidebar cleanup (3 calculators only)
+  - DFG 225 factor update (1.45)
+  - Poly+DFG 450/900 presets
+  - Playwright test suite
+- **Production URL**: https://palej-conductors.vercel.app
+- **Status**: Vercel auto-deploying. Verify deployment status in dashboard.
+
 ## [2026-02-16] - Staging Frontend Audit (Automated Testing)
 - **Goal**: Comprehensive frontend testing of staging app after UI consolidation.
 - **Method**: Playwright E2E automated testing (8 test cases).
