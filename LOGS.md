@@ -339,8 +339,8 @@
   - TypeScript compilation: `tsc --noEmit` passed.
   - Deployed to staging: Commit `b54ed3b` → `palej-app-staging` repo.
 - **Status**: Staging deployment in progress. Ready for production sync after staging validation.
-- **Update (2026-02-17)**: Split `Poly + Paper` into two material-specific presets:
-  - `Poly + Paper (Alu)` - Aluminium only, factor 0.95
-  - `Poly + Paper (Cu)` - Copper only, factor 0.95
-  - Both presets remain single-input (not dual-layer)
-  - Updated verification: 36/36 tests passing
+- **Update (2026-02-17)**: Final fix - Combined into single `Poly + Paper` preset (no material suffix):
+  - Single preset `Poly + Paper` available for both Aluminium and Copper (factor 0.95)
+  - Removed material restrictions
+  - Updated verification: 33/33 tests passing
+  - Deployed to staging and production
