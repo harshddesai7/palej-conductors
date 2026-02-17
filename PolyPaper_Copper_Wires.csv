@@ -1,0 +1,9 @@
+Month,Covering_No,Size,Wire_Value,Wire_Unit,Type_of_Insulation,Insulation_1,Insulation_2,Total_Insulation,Material,Actual_Bare_Wt_kg,Final_Dis_Qty,Insulation_Wt,Scrap,Insulation_Pct,Invoice_No_GST2526
+November 2025,,1.62 mm,1.62,mm,Poly (TPC),0.35,---,0.35,Copper,---,93,---,0.3,#VALUE!,309
+November 2025,,2.10 mm,2.10,mm,Poly + Paper,---,---,0.37-.40,Copper,135.3,140.3,5,0.65,3.6954915,289
+August 2025,2,2.13 mm,2.13,mm,Paper,0.35,---,0.35,Copper,143.5,148.4,4.9,0.9,3.414634146,166
+July 2025,2,2.35 mm,2.35,mm,Paper,0.35,---,0.35,Copper,135.9,144,8.1,0.9,5.960264901,153
+July 2025,2,2.65 mm,2.65,mm,Paper,0.35,---,0.35,Copper,285.7,297.6,11.9,1.3,4.16520826,125
+October 2025,,2.80 mm,2.80,mm,Poly (TPC),0.38-.40,---,0.38-.40,Copper,177.1,183.2,6.1,0.3,3.444381705,255
+May 2025,2,3.09 mm,3.09,mm,Paper,0.3,---,0.3,Copper,248.2,265.6,17.4,1,7.010475423,34
+November 2025,,3.40 mm,3.40,mm,DPC,0.3,---,0.3,Copper,70.3,72.5,2.2,1.3,3.129445235,291

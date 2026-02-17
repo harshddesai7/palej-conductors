@@ -1,0 +1,46 @@
+# Learnings
+
+> **Protected File**: This file logs tricky bugs, architectural decisions, and key insights discovered during development.
+> 
+> **Rule**: NEVER DELETE. NEVER MERGE. Only UPDATE/APPEND.
+
+## Project Context
+- **Market Focus**: Indian Domestic Market only. No exports.
+- **Key Products**: Enamelled, Fiber Glass, Nomex, Mica, Paper, and Cotton covered wires/strips.
+- **Phase 3 Complete**: Comprehensive forensic audit of legacy math (`PCPL-development.ds`). Definitive reference at `docs/Calculations.md`.
+- **Phase 4 Complete**: Resolved hydration issues and seeded initial users. Handed off manual backend auth setup to user.
+- **Glassmorphism**: Using `backdrop-blur-md` with semi-transparent white backgrounds (`bg-white/70`) creates a premium, high-density professional tool aesthetic in a light theme.
+- **Modular Engine**: Isolating math logic from UI components allows for easier verification and future-proofing against constant changes.
+
+## Technical Insights
+- **Calculator Verification**: Completed 52-permutation audit of the Unified Calculator. 100% parity confirmed between UI and engine math.
+- **Material Awareness**: Confirmed density and factor switching (Alu/Cu) is responsive in the frontend.
+- **XLSX Import Pipeline**: For Excel → Convex imports, the pipeline is: `pandas` → JSONL → `npx convex import`. Always handle `#VALUE!` errors in Excel exports with a `safe_float()` wrapper.
+- **Convex Schema Gotcha**: When adding tables, always run `npx convex dev --once` after schema changes to push indexes. The `_generated/api.d.ts` file won't include new functions until the push completes.
+- **Import Hygiene**: Always clean unused imports after scaffolding UI. `lucide-react` is especially prone to leftover icons.
+- **Status Machine Pattern**: For production workflow tools, keep status transitions uni-directional (PENDING → ACTIVE → COMPLETED) to prevent data inconsistency.
+- **Insulation Material Nuance**: Polyester factors are material-dependent (Alu=1.396, Cu=1.08) in standalone forms, but the Poly layer in dual-layer combos (Poly+DFG) uses a fixed 1.08 factor regardless of material. Always verify the context of the formula in legacy DS systems.
+- **Dual-Layer Reduction**: Combo products require a two-stage Bare Weight reduction (Outer Layer → Inner Layer) rather than a single additive factor for 100% accuracy.
+- **Auth Setup (CRITICAL)**: Always use `npx @convex-dev/auth --skip-git-check --allow-dirty-git-state` to initialize auth secrets. This generates proper PKCS#8 RSA keys and sets `JWT_PRIVATE_KEY`, `JWKS`, and `SITE_URL`. **Never** manually set `JWT_PRIVATE_KEY` or `CONVEX_AUTH_SECRET` via CLI — shell quoting mangles PEM formatting and extra env vars conflict with the auth library.
+- **Responsiveness**: Removing default values/placeholders must be verified on Mobile/Tablet viewports. Soft keyboards/small screens can expose UX issues missed on desktop. Added to SOP.
+- **Hydration Suppression**: Attribute mismatches from browser extensions should be handled at the `<body>` tag using `suppressHydrationWarning`. While the `<html>` tag handles global attributes, specific character-level or class-level injections by agents often target the body, requiring tag-specific suppression to keep the console clean.
+- **Vercel Environment Scopes**: Manual CLI deployments (`vercel deploy --prod`) do not automatically sync environment variables to the `Preview` or `Development` scopes. Git-triggered builds on the `main` branch use the `Preview` scope by default. Always verify that `AUTH_SECRET` and `CONVEX_URL` are enabled for **all environments** via the dashboard to prevent "build worker exited" errors.
+- **Build Exclusions**: Standalone verification scripts (e.g. `docs/math_verification.ts`) that don't follow the project's root path aliases can cause TypeScript errors during production builds. Use `tsconfig.json`'s `exclude` array to omit these folders from the global compilation to ensure build stability without refactoring non-app code.
+- **PDF Data Extraction**: When extracting structured data from PDFs, line-by-line parsing with material markers ("Alu"/"Cop") is more reliable than broad context searches. For wire dimensions, filter out false positives by checking if the line contains strip dimension patterns (width x thickness) before extracting mm/SWG values. Always validate SWG ranges (0-12) to avoid capturing unrelated numbers.
+- **Insulation PDF SOP**: For dual-layer insulation (e.g. PolyCotton, PolyDFG), effective covering for reverse-factor = lower(Ins1) + lower(Ins2). Single-layer factor reverse: `factor = (bareArea × density × pct) / ((insulatedArea - bareArea) × 100)`. Strip: insulatedArea = (W+c)(T+c); Wire: insulatedArea = 0.785×(d+c)². Densities: Al=2.709, Cu=8.89.
+- **Universal PDF Extractor**: Use longest-first insulation keyword matching (Poly + Cotton, Poly + Fibre, Edfg, DFG, Poly, Paper, Cotton) to parse varied PDF layouts. `run_insulation_pipeline.py` chains extract → clean → Excel → factor → markings in one command.
+- **Layer-Code Semantics**: In production sheets, `TPC`/`DPC`/`MPC` are layer-code markers, not standalone materials. Their meaning can be Paper or Polyester and must be inferred from the full row context. `EN` is commonly Enamel. Parser aliases and row-level normalization are required to avoid silent row loss.
+- **Quality Gate for Insulation %**: Treat non-positive or extreme `%` values as invalid for pipeline math. Filtering with `0 < Insulation % < 100` prevents invalid factors (e.g., negative factors) from contaminating top-5 factor scoring.
+- **Phase Gating Discipline**: For high-impact business logic changes, execute Excel/calculation validation as a dedicated first phase and block app code changes until stakeholder sign-off. This reduced risk of prematurely encoding unverified layer/kV assumptions in product UI.
+- **Confidence Scoring Convention**: For file-level factor ranking, confidence can be expressed as `top_support / (sum of top3_support)` to make non-technical review easier while preserving relative support context.
+- **Green-Only Consolidation Rule**: For final planning sheets, selecting only `Recommended % Marked == Yes` rows and then deduping by `Size Key + Type_of_Insulation` creates a cleaner operational dataset while preserving all relevant columns and row-level factor values.
+- **Unique-Only Tab Rule**: If business wants strictly one row per size in each final tab, run an extra pass on the consolidated workbook to dedupe by `Size Key` (fallback `Size`) using priority: green mark > higher weight > lower scrap-rate.
+- **Sharing Clarity Rule**: In final handoff workbooks, legacy helper columns (`Duplicate Count`, `Duplicate?`, `Recommended % Marked`) can confuse business readers; remove them in a clean copy and preserve only actionable highlights (e.g., top-3 factor green marks).
+
+- **Cursor Slash Commands**: Project commands live in `.cursor/commands/*.md`. Filename = command name (e.g. `d.md` → `/d`). Content is injected as prompt when user types `/d` + message. Migrated from `.agent/workflows/` (anti-gravity) to native Cursor commands.
+- **Dual-Layer Combined Factor**: For presets where image/Excel provide a single combined factor (e.g. Poly+DFG 1.45 at 8kV), use single-layer formula with `totalCovering = layer1 + layer2` instead of two-stage per-layer reduction. This matches how factors were derived and simplifies resolution logic. Legacy `calculateDualLayer*` functions retained for potential future use.
+
+---
+last_audit: 2026-02-16
+status: Phase 7 Complete - Insulation kV upgrade | 100% Math Parity | Cursor /d and /v commands active
+---
