@@ -171,13 +171,13 @@ test.describe('Staging Frontend Audit', () => {
     expect(totalText?.trim()).toBe('0.85');
   });
 
-  test('Unified Calculator - Poly + Paper shows single input + total insulation', async ({ page }) => {
+  test('Unified Calculator - Poly + Paper (Alu) shows single input + total insulation', async ({ page }) => {
     await page.click('text=Unified Calculator');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);
     
-    // Select Poly + Paper (single layer, despite + in name)
-    await page.selectOption('select', 'Poly + Paper');
+    // Select Poly + Paper (Alu) (single layer, despite + in name)
+    await page.selectOption('select', 'Poly + Paper (Alu)');
     await page.waitForTimeout(500);
     
     // Verify single insulation input appears (not dual layer inputs)
@@ -221,28 +221,38 @@ test.describe('Staging Frontend Audit', () => {
     expect(totalText?.trim()).toBe('0.12');
   });
 
-  test('Unified Calculator - Poly + Paper available for both materials', async ({ page }) => {
+  test('Unified Calculator - Poly + Paper presets show for correct materials', async ({ page }) => {
     await page.click('text=Unified Calculator');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);
     
-    // Verify Poly + Paper appears in dropdown for Aluminium (default)
+    // Verify Poly + Paper (Alu) appears in dropdown for Aluminium (default)
     const select = page.locator('select');
-    await expect(select).toContainText('Poly + Paper');
+    await expect(select).toContainText('Poly + Paper (Alu)');
+    await expect(select).not.toContainText('Poly + Paper (Cu)');
+    
+    // Select Poly + Paper (Alu) and verify factor is 0.95
+    await page.selectOption('select', 'Poly + Paper (Alu)');
+    await page.waitForTimeout(500);
+    
+    let factorInput = page.locator('input[name="factor"]');
+    let factorValue = await factorInput.inputValue();
+    expect(factorValue).toBe('0.95');
     
     // Switch to Copper
     await page.click('button:has-text("Copper")');
-    await page.waitForTimeout(300);
-    
-    // Verify Poly + Paper still appears in dropdown for Copper
-    await expect(select).toContainText('Poly + Paper');
-    
-    // Select Poly + Paper and verify factor is 0.95
-    await page.selectOption('select', 'Poly + Paper');
     await page.waitForTimeout(500);
     
-    const factorInput = page.locator('input[name="factor"]');
-    const factorValue = await factorInput.inputValue();
+    // Verify Poly + Paper (Cu) appears in dropdown for Copper
+    await expect(select).toContainText('Poly + Paper (Cu)');
+    await expect(select).not.toContainText('Poly + Paper (Alu)');
+    
+    // Select Poly + Paper (Cu) and verify factor is 0.95
+    await page.selectOption('select', 'Poly + Paper (Cu)');
+    await page.waitForTimeout(500);
+    
+    factorInput = page.locator('input[name="factor"]');
+    factorValue = await factorInput.inputValue();
     expect(factorValue).toBe('0.95');
   });
 

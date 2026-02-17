@@ -85,7 +85,8 @@ console.log("\n=== Factor Resolution (getInsulationFactor) ===\n");
 const dfg = CONSTANTS.INSULATION_TYPES.find((t) => t.name === "Dfg 225 yarn")!;
 const poly = CONSTANTS.INSULATION_TYPES.find((t) => t.name === "Polyester")!;
 const polyDfg = CONSTANTS.INSULATION_TYPES.find((t) => t.name === "Poly + Dfg 225")!;
-const polyPaper = CONSTANTS.INSULATION_TYPES.find((t) => t.name === "Poly + Paper")!;
+const polyPaperAlu = CONSTANTS.INSULATION_TYPES.find((t) => t.name === "Poly + Paper (Alu)")!;
+const polyPaperCu = CONSTANTS.INSULATION_TYPES.find((t) => t.name === "Poly + Paper (Cu)")!;
 const enamel = CONSTANTS.INSULATION_TYPES.find((t) => t.name === "Enamel")!;
 const enamelDfg = CONSTANTS.INSULATION_TYPES.find((t) => t.name === "Enamel + Dfg 900")!;
 assertEq(getInsulationFactor(dfg, "ALUMINIUM"), 1.45, 0.001, "DFG Alu factor = 1.45");
@@ -95,14 +96,16 @@ assertEq(getInsulationFactor(poly, "COPPER"), 1.3, 0.001, "Polyester Cu factor =
 assertEq(getInsulationFactor(polyDfg, "ALUMINIUM", "8 kV"), 1.45, 0.001, "Poly+DFG Alu 8kV = 1.45");
 assertEq(getInsulationFactor(polyDfg, "ALUMINIUM", "18 kV"), 1.35, 0.001, "Poly+DFG Alu 18kV = 1.35");
 assertEq(getInsulationFactor(polyDfg, "COPPER", "8 kV"), 1.45, 0.001, "Poly+DFG Cu 8kV = 1.45");
-assertEq(getInsulationFactor(polyPaper, "ALUMINIUM"), 0.95, 0.001, "Poly+Paper Alu = 0.95");
-assertEq(getInsulationFactor(polyPaper, "COPPER"), 0.95, 0.001, "Poly+Paper Cu = 0.95");
+assertEq(getInsulationFactor(polyPaperAlu, "ALUMINIUM"), 0.95, 0.001, "Poly+Paper (Alu) = 0.95");
+assertEq(getInsulationFactor(polyPaperCu, "COPPER"), 0.95, 0.001, "Poly+Paper (Cu) = 0.95");
 
 console.log("\n=== Default Thickness (getDefaultThickness) ===\n");
 assertEq(getDefaultThickness(polyDfg, "STRIP"), 0.35 + 0.5, 0.001, "Poly+DFG strip default = 0.85");
 assertEq(getDefaultThickness(poly, "STRIP"), 0.5, 0.001, "Polyester strip default = 0.50");
-assertEq(getDefaultThickness(polyPaper, "STRIP"), 0.5, 0.001, "Poly+Paper strip default = 0.50");
-assertEq(getDefaultThickness(polyPaper, "WIRE"), 0.4, 0.001, "Poly+Paper wire default = 0.40");
+assertEq(getDefaultThickness(polyPaperAlu, "STRIP"), 0.5, 0.001, "Poly+Paper (Alu) strip default = 0.50");
+assertEq(getDefaultThickness(polyPaperAlu, "WIRE"), 0.4, 0.001, "Poly+Paper (Alu) wire default = 0.40");
+assertEq(getDefaultThickness(polyPaperCu, "STRIP"), 0.5, 0.001, "Poly+Paper (Cu) strip default = 0.50");
+assertEq(getDefaultThickness(polyPaperCu, "WIRE"), 0.4, 0.001, "Poly+Paper (Cu) wire default = 0.40");
 assertEq(getDefaultThickness(enamel, "STRIP"), 0.12, 0.001, "Enamel strip default = 0.12");
 assertEq(enamelDfg.defaultLayer1Thickness ?? 0, 0.10, 0.001, "Enamel+DFG layer1 (enamel) default = 0.10");
 
@@ -129,9 +132,11 @@ assertEq(lmeRes.lmePlusPremium, 10190, 0.1, "LME + Premium = 10190");
 assertEq(lmeRes.cspRate, 970.8, 1, "CSP rate ~ 970.8");
 assertEq(lmeRes.wwmaiRate, 1018.56, 0.5, "WWMAI rate ~ 1018.6");
 
-console.log("\n=== Poly+Paper Material Availability ===\n");
-const polyPaperRestriction = polyPaper?.materialRestriction;
-assertEqStr(polyPaperRestriction ?? "", "", "Poly+Paper available for both materials (no restriction)");
+console.log("\n=== Poly+Paper Material Restrictions ===\n");
+const polyPaperAluRestriction = polyPaperAlu?.materialRestriction;
+const polyPaperCuRestriction = polyPaperCu?.materialRestriction;
+assertEqStr(polyPaperAluRestriction ?? "", "ALUMINIUM", "Poly+Paper (Alu) restricted to ALUMINIUM");
+assertEqStr(polyPaperCuRestriction ?? "", "COPPER", "Poly+Paper (Cu) restricted to COPPER");
 
 console.log("\n=== Summary ===\n");
 console.log(`Passed: ${passed}, Failed: ${failed}`);
