@@ -467,6 +467,12 @@ function UnifiedCalculatorContent() {
                                         onChange={handleInputChange}
                                         highlight
                                     />
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 pl-1">Total Insulation (mm)</label>
+                                        <div className="w-full bg-indigo-50/70 border border-indigo-200 rounded-xl px-4 py-3 text-slate-900 font-medium text-center">
+                                            {(Number(inputs.polyCov) || 0) + (Number(inputs.dfgCov) || 0)}
+                                        </div>
+                                    </div>
                                     <InputGroup
                                         label="Insulation Factor"
                                         name="factor"
@@ -484,6 +490,12 @@ function UnifiedCalculatorContent() {
                                         onChange={handleInputChange}
                                         highlight={selectedType !== "Manual"}
                                     />
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 pl-1">Total Insulation (mm)</label>
+                                        <div className="w-full bg-indigo-50/70 border border-indigo-200 rounded-xl px-4 py-3 text-slate-900 font-medium text-center">
+                                            {Number(inputs.insulationThickness) || 0}
+                                        </div>
+                                    </div>
                                     <InputGroup
                                         label="Insulation Factor"
                                         name="factor"

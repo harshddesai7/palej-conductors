@@ -143,6 +143,109 @@ test.describe('Staging Frontend Audit', () => {
     await expect(kV18Button).toBeVisible({ timeout: 5000 });
   });
 
+  test('Unified Calculator - Dual layer preset shows 2 inputs + total insulation', async ({ page }) => {
+    await page.click('text=Unified Calculator');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
+    
+    // Select Poly + Dfg 225 (dual layer)
+    await page.selectOption('select', 'Poly + Dfg 225');
+    await page.waitForTimeout(500);
+    
+    // Verify two layer inputs appear
+    await expect(page.locator('input[name="polyCov"]')).toBeVisible();
+    await expect(page.locator('input[name="dfgCov"]')).toBeVisible();
+    
+    // Verify total insulation display appears
+    const totalInsulationLabel = page.locator('label:has-text("Total Insulation (mm)")');
+    await expect(totalInsulationLabel).toBeVisible();
+    
+    // Enter values and verify total updates
+    await page.fill('input[name="polyCov"]', '0.35');
+    await page.fill('input[name="dfgCov"]', '0.50');
+    await page.waitForTimeout(300);
+    
+    // Check total insulation shows sum (0.85)
+    const totalInsulationDiv = totalInsulationLabel.locator('..').locator('div').last();
+    const totalText = await totalInsulationDiv.textContent();
+    expect(totalText?.trim()).toBe('0.85');
+  });
+
+  test('Unified Calculator - Poly + Paper shows single input + total insulation', async ({ page }) => {
+    await page.click('text=Unified Calculator');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
+    
+    // Select Poly + Paper (single layer, despite + in name)
+    await page.selectOption('select', 'Poly + Paper');
+    await page.waitForTimeout(500);
+    
+    // Verify single insulation input appears (not dual layer inputs)
+    await expect(page.locator('input[name="insulationThickness"]')).toBeVisible();
+    await expect(page.locator('input[name="polyCov"]')).not.toBeVisible();
+    await expect(page.locator('input[name="dfgCov"]')).not.toBeVisible();
+    
+    // Verify total insulation display appears
+    const totalInsulationLabel = page.locator('label:has-text("Total Insulation (mm)")');
+    await expect(totalInsulationLabel).toBeVisible();
+    
+    // Enter value and verify total matches
+    await page.fill('input[name="insulationThickness"]', '0.50');
+    await page.waitForTimeout(300);
+    
+    const totalInsulationDiv = totalInsulationLabel.locator('..').locator('div').last();
+    const totalText = await totalInsulationDiv.textContent();
+    expect(totalText?.trim()).toBe('0.5');
+  });
+
+  test('Unified Calculator - Enamel default is 0.12 mm', async ({ page }) => {
+    await page.click('text=Unified Calculator');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
+    
+    // Select Enamel preset
+    await page.selectOption('select', 'Enamel');
+    await page.waitForTimeout(500);
+    
+    // Verify default thickness is 0.12
+    const insulationInput = page.locator('input[name="insulationThickness"]');
+    await expect(insulationInput).toBeVisible();
+    const value = await insulationInput.inputValue();
+    expect(value).toBe('0.12');
+    
+    // Verify total insulation shows 0.12
+    const totalInsulationLabel = page.locator('label:has-text("Total Insulation (mm)")');
+    await expect(totalInsulationLabel).toBeVisible();
+    const totalInsulationDiv = totalInsulationLabel.locator('..').locator('div').last();
+    const totalText = await totalInsulationDiv.textContent();
+    expect(totalText?.trim()).toBe('0.12');
+  });
+
+  test('Unified Calculator - Poly + Paper available for both materials', async ({ page }) => {
+    await page.click('text=Unified Calculator');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
+    
+    // Verify Poly + Paper appears in dropdown for Aluminium (default)
+    const select = page.locator('select');
+    await expect(select).toContainText('Poly + Paper');
+    
+    // Switch to Copper
+    await page.click('button:has-text("Copper")');
+    await page.waitForTimeout(300);
+    
+    // Verify Poly + Paper still appears in dropdown for Copper
+    await expect(select).toContainText('Poly + Paper');
+    
+    // Select Poly + Paper and verify factor is 0.95
+    await page.selectOption('select', 'Poly + Paper');
+    await page.waitForTimeout(500);
+    
+    const factorInput = page.locator('input[name="factor"]');
+    const factorValue = await factorInput.inputValue();
+    expect(factorValue).toBe('0.95');
+  });
+
   test('Bare redirect works', async ({ page }) => {
     await page.goto(`${STAGING_URL}/dashboard/bare`);
     
