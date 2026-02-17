@@ -94,10 +94,10 @@
   - New presets: Poly+Cotton (1.30), Poly+Paper (0.95, both materials).
   - Material-restricted presets filtered; dual-layer uses combined factor + summed covering.
 - **Insulation Preset UX Fixes (2026-02-17):**
-  - `Poly + Paper` renamed from `1 Poly + Paper (Alu)`, now available for both materials (factor 0.95).
+  - `Poly + Paper` split into two material-specific presets: `Poly + Paper (Alu)` and `Poly + Paper (Cu)` (both factor 0.95).
   - Enamel defaults corrected: single layer 0.12 mm, dual layer enamel 0.10 mm.
   - Total Insulation (mm) display added for all presets (shows sum for dual-layer, single value for single-layer).
-  - All dual-layer presets show two separate insulation inputs; `Poly + Paper` remains single-input (exception).
+  - All dual-layer presets show two separate insulation inputs; `Poly + Paper` presets remain single-input (exception).
 - **Recent Fixes:**
   - Hydration mismatch resolved in `layout.tsx`.
   - Mobile selector visibility fixed with `ChevronDown`.
