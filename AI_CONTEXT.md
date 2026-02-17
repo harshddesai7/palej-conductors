@@ -91,8 +91,13 @@
 - **Insulation kV Upgrade (Phase 2):**
   - Poly+DFG 225, 450, 900 presets support 8 kV / 18 kV selector (Alu: 1.45 / 1.35).
   - Factors updated per image + Excel top-1 (DFG 1.50/1.70, Poly 1.40/1.30, Cotton 0.70, Enamel+DFG 0.85).
-  - New presets: Poly+Cotton (1.30), 1 Poly+Paper (Alu) (0.95).
+  - New presets: Poly+Cotton (1.30), Poly+Paper (0.95, both materials).
   - Material-restricted presets filtered; dual-layer uses combined factor + summed covering.
+- **Insulation Preset UX Fixes (2026-02-17):**
+  - `Poly + Paper` renamed from `1 Poly + Paper (Alu)`, now available for both materials (factor 0.95).
+  - Enamel defaults corrected: single layer 0.12 mm, dual layer enamel 0.10 mm.
+  - Total Insulation (mm) display added for all presets (shows sum for dual-layer, single value for single-layer).
+  - All dual-layer presets show two separate insulation inputs; `Poly + Paper` remains single-input (exception).
 - **Recent Fixes:**
   - Hydration mismatch resolved in `layout.tsx`.
   - Mobile selector visibility fixed with `ChevronDown`.

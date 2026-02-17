@@ -320,3 +320,22 @@
   - Reapplied top-3 factor green highlighting on `factor` column for every tab.
 - **Verification**:
   - Opened `Phase1_Master_Consolidated_Unique_Clear.xlsx` in Microsoft Excel.
+
+## [2026-02-17] - Insulation Preset UX Fixes
+- **Goal**: Fix dual insulation input visibility, add total insulation display, correct enamel defaults.
+- **Changes**:
+  - Renamed `1 Poly + Paper (Alu)` to `Poly + Paper` (available for both Aluminium and Copper, factor 0.95).
+  - Updated enamel defaults: single layer `Enamel` preset default thickness 0.03 → 0.12 mm.
+  - Updated `Enamel + Dfg 900` dual layer: enamel layer default 0.03 → 0.10 mm.
+  - Added **Total Insulation (mm)** display field for all presets (computed: single = insulationThickness, dual = layer1 + layer2).
+  - Kept `Poly + Paper` as single-input preset (explicit exception despite `+` in name).
+- **Files Modified**:
+  - `src/lib/calculators/engine.ts`: Preset definitions updated.
+  - `src/app/dashboard/calculator/page.tsx`: Added total insulation display UI.
+  - `docs/verify_calculators.ts`: Extended with 6 new checks (33 total, all passing).
+  - `docs/test_staging.spec.ts`: Added 4 new E2E tests for dual/single inputs, total display, enamel defaults, material availability.
+- **Verification**:
+  - Engine verification: 33/33 tests passed.
+  - TypeScript compilation: `tsc --noEmit` passed.
+  - Deployed to staging: Commit `b54ed3b` → `palej-app-staging` repo.
+- **Status**: Staging deployment in progress. Ready for production sync after staging validation.
