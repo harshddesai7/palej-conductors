@@ -84,7 +84,7 @@
 - **Modules (8):**
   - All 8 modules verified with live data and logic parity (DS pass complete).
 - **Insulation kV Upgrade (Phase 2):**
-  - Poly+DFG preset supports 8 kV / 18 kV selector (Alu: 1.45 / 1.35).
+  - Poly+DFG 225, 450, 900 presets support 8 kV / 18 kV selector (Alu: 1.45 / 1.35).
   - Factors updated per image + Excel top-1 (DFG 1.50/1.70, Poly 1.40/1.30, Cotton 0.70, Enamel+DFG 0.85).
   - New presets: Poly+Cotton (1.30), 1 Poly+Paper (Alu) (0.95).
   - Material-restricted presets filtered; dual-layer uses combined factor + summed covering.

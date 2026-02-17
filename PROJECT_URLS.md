@@ -12,7 +12,7 @@
 ## Staging (Phase 2 - Insulation kV Upgrade)
 - [Staging App](https://palej-app-staging.vercel.app): Staging Vercel deployment.
 - [Staging Repo](https://github.com/harshddesai7/palej-app-staging): GitHub codebase.
-- **Convex**: Currently using dev deployment (keen-raccoon-545). To create a dedicated staging Convex project: Dashboard → New Project → "palej-app-staging" → deploy schema → update Vercel env vars.
+- **Convex**: Uses production deployment (friendly-hedgehog-108) for login parity. Dev (keen-raccoon-545) not used for staging.
 
 ## Development
 - **Local Development**: `http://localhost:3000` (when running `npm run dev`)

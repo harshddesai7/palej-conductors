@@ -204,6 +204,16 @@
   - `unique_check True` across all non-empty tabs.
   - Opened `Phase1_Master_Consolidated_Unique.xlsx` in Microsoft Excel.
 
+## [2026-02-16] - Phase 2 Completion: Poly+DFG 450/900 & Staging Deploy
+- **Goal**: Complete remaining Phase 2 plan items and deploy to staging (local → live).
+- **Engine** (`src/lib/calculators/engine.ts`):
+  - Added `Poly + Dfg 450` and `Poly + Dfg 900` presets with kVOptions (8 kV / 18 kV), same factors as 225.
+- **Verification**:
+  - `npx tsx docs/verify_calculators.ts` — 29/29 passed.
+  - `npm run build` — passed (requires `NEXT_PUBLIC_CONVEX_URL` in env for local build).
+- **Deploy**: Pushed to `palej-app-staging` (master). Vercel auto-deploys on push.
+- **Status**: Staging live at https://palej-app-staging.vercel.app. User to verify Poly+DFG 450/900 in calculator UI.
+
 ## [2026-02-17] - Staging Deployment (palej-app-staging)
 - **Goal**: Deploy Phase 2 changes to a new staging project (Vercel, GitHub, Convex) without touching production.
 - **GitHub**: Created [palej-app-staging](https://github.com/harshddesai7/palej-app-staging), pushed Phase 2 baseline.

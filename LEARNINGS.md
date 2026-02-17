@@ -37,6 +37,7 @@
 - **Unique-Only Tab Rule**: If business wants strictly one row per size in each final tab, run an extra pass on the consolidated workbook to dedupe by `Size Key` (fallback `Size`) using priority: green mark > higher weight > lower scrap-rate.
 - **Sharing Clarity Rule**: In final handoff workbooks, legacy helper columns (`Duplicate Count`, `Duplicate?`, `Recommended % Marked`) can confuse business readers; remove them in a clean copy and preserve only actionable highlights (e.g., top-3 factor green marks).
 
+- **Local Build Requirement**: `npm run build` requires `NEXT_PUBLIC_CONVEX_URL` in environment. If missing, ConvexReactClient throws "No address provided". Set via `.env.local` or `$env:NEXT_PUBLIC_CONVEX_URL="https://...convex.cloud"` before build. Vercel injects this automatically.
 - **Cursor Slash Commands**: Project commands live in `.cursor/commands/*.md`. Filename = command name (e.g. `d.md` → `/d`). Content is injected as prompt when user types `/d` + message. Migrated from `.agent/workflows/` (anti-gravity) to native Cursor commands.
 - **Dual-Layer Combined Factor**: For presets where image/Excel provide a single combined factor (e.g. Poly+DFG 1.45 at 8kV), use single-layer formula with `totalCovering = layer1 + layer2` instead of two-stage per-layer reduction. This matches how factors were derived and simplifies resolution logic. Legacy `calculateDualLayer*` functions retained for potential future use.
 
