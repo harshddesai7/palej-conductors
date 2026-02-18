@@ -4,11 +4,18 @@
 > 
 > **Rule**: NEVER DELETE. NEVER MERGE. Only UPDATE/APPEND.
 
+## [2026-02-17] Cotton Presets: Remove Material Restriction, Rename for Clarity
+- **Change**: Cotton 32s and Cotton 42s no longer restricted by material; users can select either regardless of Aluminium/Copper.
+- **Rename**: "Cotton 32s ( alu )" → "Cotton 32s ( mainly alu )"; "Cotton 42s ( cu )" → "Cotton 42s ( mainly cu )" — indicates best-fit material without forcing selection.
+- **File**: `src/lib/calculators/engine.ts`
+- **Deployment**: Staging and production.
+
 ## [2026-02-17] Remove Unverified DS Alert from Unified Calculator
 - **Change**: Removed "⚠️ Unverified in DS" badge that appeared when Cotton 42s (cu) was selected.
 - **Reason**: Cotton 42s factor (1.80) is now verified per handwritten spec; alert no longer required.
 - **File**: `src/app/dashboard/calculator/page.tsx`
 - **Verification**: No linter errors; build compiles (Convex URL required for full static gen on Vercel).
+- **Deployment**: Pushed to staging (2b1b117), synced to production. Live at https://palej-conductors.vercel.app
 
 ## [2026-02-18] CLI Login Documentation
 - **Created**: `docs/CLI_LOGIN.md` — step-by-step guide for logging into GitHub, Vercel, and Convex.
