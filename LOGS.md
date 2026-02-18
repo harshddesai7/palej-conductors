@@ -4,6 +4,12 @@
 > 
 > **Rule**: NEVER DELETE. NEVER MERGE. Only UPDATE/APPEND.
 
+## [2026-02-17] Search Database: Fix Client-Side Crash
+- **Issue**: Search Database page showed "Application error: a client-side exception has occurred" on production.
+- **Fix**: (1) ConvexClientProvider: guard for undefined NEXT_PUBLIC_CONVEX_URL to prevent constructor throw. (2) Search page: safe JSON.stringify and String() in filter/sort to prevent circular ref or type errors. (3) Added error.tsx for Search route to catch and display friendly fallback.
+- **Files**: `src/components/ConvexClientProvider.tsx`, `src/app/dashboard/search/page.tsx`, `src/app/dashboard/search/error.tsx` (new).
+- **Deployment**: Staging and production.
+
 ## [2026-02-17] Cotton Presets: Preferred Material on Selection
 - **Change**: When user selects Cotton 42s (mainly cu), material auto-switches to Copper; Cotton 32s (mainly alu) → Aluminium. Users can still change material afterward.
 - **File**: `src/app/dashboard/calculator/page.tsx`

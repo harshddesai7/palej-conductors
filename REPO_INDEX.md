@@ -36,6 +36,7 @@
 ## Documentation
 
 - [docs/Calculations.md](docs/Calculations.md): Definitive math engine formulas and factor matrix.
+- [docs/CLI_LOGIN.md](docs/CLI_LOGIN.md): How to log into GitHub, Vercel, and Convex CLIs (workwithharshdesai@gmail.com).
 - [docs/frontend_audit_report.md](docs/frontend_audit_report.md): Record of 52-permutation logic verification.
 - [docs/INSULATION_PDF_TO_EXCEL_SOP.md](docs/INSULATION_PDF_TO_EXCEL_SOP.md): Reusable SOP for transforming insulation PDFs to 4-tab Excel workbooks (extraction, marking, reverse-factor).
 - [docs/PHASE1_EXCEL_FACTOR_REVIEW.md](docs/PHASE1_EXCEL_FACTOR_REVIEW.md): Phase 1 business-readable review of top-3 factors and confidence for all regenerated Excel files.

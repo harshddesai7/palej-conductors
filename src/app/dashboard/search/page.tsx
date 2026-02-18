@@ -30,21 +30,33 @@ export default function SearchDatabasePage() {
 
     const currentData = selectedDatabase === "unified" ? unifiedData : factorData;
 
+    const safeStringify = (obj: unknown): string => {
+        try {
+            return typeof obj === "object" && obj !== null ? JSON.stringify(obj) : String(obj ?? "");
+        } catch {
+            return "";
+        }
+    };
+
     const filteredData = useMemo(() => {
-        if (!currentData) return [];
-        let filtered = currentData.filter((item: any) => {
-            if (!searchQuery) return true;
-            const query = searchQuery.toLowerCase();
-            return (
-                item.material?.toLowerCase().includes(query) ||
-                item.shape?.toLowerCase().includes(query) ||
-                item.mode?.toLowerCase().includes(query) ||
-                item.insulationType?.toLowerCase().includes(query) ||
-                JSON.stringify(item.inputs).toLowerCase().includes(query) ||
-                JSON.stringify(item.results).toLowerCase().includes(query)
-            );
-        });
-        return filtered;
+        if (!currentData || !Array.isArray(currentData)) return [];
+        try {
+            return currentData.filter((item: any) => {
+                if (!searchQuery) return true;
+                const query = searchQuery.toLowerCase();
+                const str = (v: unknown) => (v != null ? String(v).toLowerCase() : "");
+                return (
+                    str(item.material).includes(query) ||
+                    str(item.shape).includes(query) ||
+                    str(item.mode).includes(query) ||
+                    str(item.insulationType).includes(query) ||
+                    safeStringify(item.inputs).toLowerCase().includes(query) ||
+                    safeStringify(item.results).toLowerCase().includes(query)
+                );
+            });
+        } catch {
+            return [];
+        }
     }, [currentData, searchQuery]);
 
     const sortedData = useMemo(() => {
@@ -64,8 +76,8 @@ export default function SearchDatabasePage() {
                 case "mode":
                 case "insulationType":
                 case "kV":
-                    aVal = (a[sortColumn] || "").toLowerCase();
-                    bVal = (b[sortColumn] || "").toLowerCase();
+                    aVal = String(a[sortColumn] ?? "").toLowerCase();
+                    bVal = String(b[sortColumn] ?? "").toLowerCase();
                     return sortDirection === "asc" 
                         ? aVal.localeCompare(bVal)
                         : bVal.localeCompare(aVal);

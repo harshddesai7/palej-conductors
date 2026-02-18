@@ -25,6 +25,11 @@
 - **Controlled Inputs**: When `value` is a number, React normalizes display (0.50 shows as 0.5). The value is correct; step/min/max ensure browser validation allows the range.
 - **No Placeholder Rule**: User preference: Factor Calculator should have no placeholder values. Use empty string `""` for initial state; parse via `Number(x) || 0` for calculation. Aligns with Unified Calculator pattern (`Record<string, string | number>`).
 
+## Search Database Client-Side Crash (2026-02-17)
+- **Symptom**: "Application error: a client-side exception has occurred" on /dashboard/search.
+- **Root causes**: (1) ConvexReactClient throws when NEXT_PUBLIC_CONVEX_URL is undefined. (2) JSON.stringify on Convex documents can throw on circular refs. (3) Sort comparator accessing non-string values with .toLowerCase() can throw.
+- **Fix**: Guard ConvexClientProvider; use safeStringify and String() in filter/sort; add error boundary (error.tsx) for graceful fallback.
+
 ## Enhanced Search Database Table (2026-02-17)
 - **Frozen Column Pattern**: Using CSS `position: sticky` with `left: 0` and appropriate `z-index` creates frozen columns that stay visible during horizontal scroll. Critical for wide tables where key identifiers (like timestamps) must remain visible.
 - **Multi-Column Sorting UX**: Clickable column headers with visual indicators (up/down arrows) provide intuitive sorting. Using `useMemo` for sorted data prevents unnecessary recalculations on every render.
