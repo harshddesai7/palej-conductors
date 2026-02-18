@@ -9,6 +9,7 @@
 - **Root cause**: Convex useQuery may fail during SSR/initial render when Convex client not fully ready.
 - **Fix**: Split into SearchDatabaseClient.tsx + page.tsx using `dynamic(..., { ssr: false })` so Search only renders on client.
 - **Files**: `src/app/dashboard/search/page.tsx`, `src/app/dashboard/search/SearchDatabaseClient.tsx` (new).
+- **Deployment**: Pushed 701a48f to staging and production. Verify at https://palej-conductors.vercel.app/dashboard/search
 
 ## [2026-02-17] Search Database: Fix Client-Side Crash
 - **Issue**: Search Database page showed "Application error: a client-side exception has occurred" on production.

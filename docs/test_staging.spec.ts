@@ -288,10 +288,13 @@ test.describe('Staging Frontend Audit', () => {
   test('Search Database - navigates and shows database selector', async ({ page }) => {
     await page.click('text=Search Database');
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000); // Allow dynamic load + Convex fetch
+    
+    // Should NOT show error boundary
+    await expect(page.locator('text=Something went wrong')).not.toBeVisible();
     
     // Check database selector buttons exist
-    await expect(page.locator('button:has-text("Unified Calculator Database")')).toBeVisible();
+    await expect(page.locator('button:has-text("Unified Calculator Database")')).toBeVisible({ timeout: 8000 });
     await expect(page.locator('button:has-text("Factor Calculator Database")')).toBeVisible();
     
     // Check search input exists

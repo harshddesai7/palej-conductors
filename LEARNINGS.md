@@ -27,6 +27,8 @@
 
 ## Search Database Client-Side Crash (2026-02-17)
 - **Dynamic import fix**: Convex useQuery can fail during SSR. Use `dynamic(() => import("./SearchDatabaseClient"), { ssr: false })` so the component only renders on the client where Convex is available.
+- **Mounted check**: `const [mounted, setMounted] = useState(false); useEffect(() => setMounted(true), []);` then `if (!mounted) return <Loader />` ensures Convex hooks only run after client hydration.
+- **safeNum for toFixed**: DB values can be strings or undefined. Use `safeNum(v, decimals)` that wraps Number() and checks isFinite before toFixed to prevent runtime throws.
 - **Symptom**: "Application error: a client-side exception has occurred" on /dashboard/search.
 - **Root causes**: (1) ConvexReactClient throws when NEXT_PUBLIC_CONVEX_URL is undefined. (2) JSON.stringify on Convex documents can throw on circular refs. (3) Sort comparator accessing non-string values with .toLowerCase() can throw.
 - **Fix**: Guard ConvexClientProvider; use safeStringify and String() in filter/sort; add error boundary (error.tsx) for graceful fallback.

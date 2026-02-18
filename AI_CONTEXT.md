@@ -110,7 +110,7 @@
     - Newest-first ordering by timestamp (default)
     - Enhanced search/filter functionality across inputs and results
   - **Duplicate Prevention**: Uses `answerHash` metadata to prevent duplicate saves per user.
-  - **Search Database**: Fixed client-side crash (2026-02-17) with ConvexClientProvider guard, safe filter/sort, and error boundary.
+  - **Search Database**: Fixed client-side crash (2026-02-17) — mounted check, safeNum for toFixed, ConvexClientProvider guard, error boundary. Playwright-verified.
   - **Feedback System**: Optional Right (Green) / Wrong (Red) buttons stored in `feedback` table (references `unified_calculations`).
   - **Architecture Rule**: Each left-tab feature uses its own database table with auto-save and timestamps.
   - **Backward Compatibility**: Old `calculations` table retained temporarily with optional `saveMode` field.
