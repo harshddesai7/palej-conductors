@@ -4,11 +4,17 @@
 > 
 > **Rule**: NEVER DELETE. NEVER MERGE. Only UPDATE/APPEND.
 
+## [2026-02-17] Search Database: Dynamic Import (Client-Only) Fix
+- **Issue**: Search page still crashed after defensive fixes; error boundary caught it but root cause persisted.
+- **Root cause**: Convex useQuery may fail during SSR/initial render when Convex client not fully ready.
+- **Fix**: Split into SearchDatabaseClient.tsx + page.tsx using `dynamic(..., { ssr: false })` so Search only renders on client.
+- **Files**: `src/app/dashboard/search/page.tsx`, `src/app/dashboard/search/SearchDatabaseClient.tsx` (new).
+
 ## [2026-02-17] Search Database: Fix Client-Side Crash
 - **Issue**: Search Database page showed "Application error: a client-side exception has occurred" on production.
 - **Fix**: (1) ConvexClientProvider: guard for undefined NEXT_PUBLIC_CONVEX_URL to prevent constructor throw. (2) Search page: safe JSON.stringify and String() in filter/sort to prevent circular ref or type errors. (3) Added error.tsx for Search route to catch and display friendly fallback.
 - **Files**: `src/components/ConvexClientProvider.tsx`, `src/app/dashboard/search/page.tsx`, `src/app/dashboard/search/error.tsx` (new).
-- **Deployment**: Staging and production.
+- **Deployment**: Pushed to staging (92a8f55) and production. Live at https://palej-app-staging.vercel.app/dashboard/search and https://palej-conductors.vercel.app/dashboard/search
 
 ## [2026-02-17] Cotton Presets: Preferred Material on Selection
 - **Change**: When user selects Cotton 42s (mainly cu), material auto-switches to Copper; Cotton 32s (mainly alu) → Aluminium. Users can still change material afterward.

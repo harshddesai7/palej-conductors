@@ -26,6 +26,7 @@
 - **No Placeholder Rule**: User preference: Factor Calculator should have no placeholder values. Use empty string `""` for initial state; parse via `Number(x) || 0` for calculation. Aligns with Unified Calculator pattern (`Record<string, string | number>`).
 
 ## Search Database Client-Side Crash (2026-02-17)
+- **Dynamic import fix**: Convex useQuery can fail during SSR. Use `dynamic(() => import("./SearchDatabaseClient"), { ssr: false })` so the component only renders on the client where Convex is available.
 - **Symptom**: "Application error: a client-side exception has occurred" on /dashboard/search.
 - **Root causes**: (1) ConvexReactClient throws when NEXT_PUBLIC_CONVEX_URL is undefined. (2) JSON.stringify on Convex documents can throw on circular refs. (3) Sort comparator accessing non-string values with .toLowerCase() can throw.
 - **Fix**: Guard ConvexClientProvider; use safeStringify and String() in filter/sort; add error boundary (error.tsx) for graceful fallback.
