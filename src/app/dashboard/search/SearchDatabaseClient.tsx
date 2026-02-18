@@ -19,6 +19,11 @@ import { cn } from "@/lib/utils";
 type SortColumn = string | null;
 type SortDirection = "asc" | "desc";
 
+const safeNum = (v: unknown, decimals = 2): string => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n.toFixed(decimals) : "—";
+};
+
 export default function SearchDatabaseClient() {
     const [selectedDatabase, setSelectedDatabase] = useState<"unified" | "factor">("unified");
     const [searchQuery, setSearchQuery] = useState("");
@@ -167,13 +172,13 @@ export default function SearchDatabaseClient() {
             const t = inputs.thickness || 0;
             const bareArea = results.bareArea || 0;
             if (w > 0 && t > 0) {
-                return `${w}×${t} (${bareArea.toFixed(2)} mm²)`;
+                return `${w}×${t} (${safeNum(bareArea, 2)} mm²)`;
             }
         } else if (shape === "WIRE") {
             const d = inputs.dia || 0;
             const bareArea = results.bareArea || 0;
             if (d > 0) {
-                return `${d} (${bareArea.toFixed(2)} mm²)`;
+                return `${d} (${safeNum(bareArea, 2)} mm²)`;
             }
         }
         return "—";
@@ -339,8 +344,8 @@ export default function SearchDatabaseClient() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {sortedData.map((item: any) => (
-                                    <tr key={item._id} className="hover:bg-slate-50/30 transition-colors">
+                                {sortedData.map((item: any, idx: number) => (
+                                    <tr key={item._id ?? `row-${idx}`} className="hover:bg-slate-50/30 transition-colors">
                                         {selectedDatabase === "unified" && (
                                             <>
                                                 <td className="sticky left-0 z-20 bg-white/95 backdrop-blur-sm px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">
@@ -353,13 +358,13 @@ export default function SearchDatabaseClient() {
                                                 <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.insulationType || "—"}</td>
                                                 <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.kV || "—"}</td>
                                                 <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{formatInsulationThickness(item)}</td>
-                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.inputs?.factor ? item.inputs.factor.toFixed(4) : "—"}</td>
-                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.results?.percentIncrease ? `${item.results.percentIncrease.toFixed(2)}%` : "—"}</td>
-                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.results?.bareWtReqd ? `${item.results.bareWtReqd.toFixed(2)} kg` : "—"}</td>
-                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.inputs?.finalWtReqd ? `${item.inputs.finalWtReqd.toFixed(2)} kg` : "—"}</td>
-                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.results?.metersPerSpool ? `${item.results.metersPerSpool.toFixed(0)} m` : "—"}</td>
-                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.results?.productionKgHr ? `${item.results.productionKgHr.toFixed(2)} kg/hr` : "—"}</td>
-                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.results?.totalHoursReqd ? `${item.results.totalHoursReqd.toFixed(2)} hrs` : "—"}</td>
+                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{safeNum(item.inputs?.factor, 4)}</td>
+                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.results?.percentIncrease != null ? `${safeNum(item.results.percentIncrease, 2)}%` : "—"}</td>
+                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.results?.bareWtReqd != null ? `${safeNum(item.results.bareWtReqd, 2)} kg` : "—"}</td>
+                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.inputs?.finalWtReqd != null ? `${safeNum(item.inputs.finalWtReqd, 2)} kg` : "—"}</td>
+                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.results?.metersPerSpool != null ? `${safeNum(item.results.metersPerSpool, 0)} m` : "—"}</td>
+                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.results?.productionKgHr != null ? `${safeNum(item.results.productionKgHr, 2)} kg/hr` : "—"}</td>
+                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.results?.totalHoursReqd != null ? `${safeNum(item.results.totalHoursReqd, 2)} hrs` : "—"}</td>
                                                 <td className="px-3 py-2 border-b border-slate-100">
                                                     <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap", item.saveMode === "AUTO" ? "bg-emerald-100 text-emerald-700" : "bg-blue-100 text-blue-700")}>{item.saveMode || "MANUAL"}</span>
                                                 </td>
@@ -372,9 +377,9 @@ export default function SearchDatabaseClient() {
                                                 </td>
                                                 <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.material || "—"}</td>
                                                 <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.inputs?.width && item.inputs?.thickness ? `${item.inputs.width}×${item.inputs.thickness}` : "—"}</td>
-                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.inputs?.covering ? `${item.inputs.covering.toFixed(2)} mm` : "—"}</td>
-                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.inputs?.percentageIncrease ? `${item.inputs.percentageIncrease.toFixed(2)}%` : "—"}</td>
-                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap font-medium">{item.results?.factor ? item.results.factor.toFixed(6) : "—"}</td>
+                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.inputs?.covering != null ? `${safeNum(item.inputs.covering, 2)} mm` : "—"}</td>
+                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap">{item.inputs?.percentageIncrease != null ? `${safeNum(item.inputs.percentageIncrease, 2)}%` : "—"}</td>
+                                                <td className="px-3 py-2 border-b border-slate-100 text-xs text-slate-600 whitespace-nowrap font-medium">{safeNum(item.results?.factor, 6)}</td>
                                                 <td className="px-3 py-2 border-b border-slate-100">
                                                     <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap", item.saveMode === "AUTO" ? "bg-emerald-100 text-emerald-700" : "bg-blue-100 text-blue-700")}>{item.saveMode || "MANUAL"}</span>
                                                 </td>
