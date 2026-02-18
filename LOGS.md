@@ -4,6 +4,24 @@
 > 
 > **Rule**: NEVER DELETE. NEVER MERGE. Only UPDATE/APPEND.
 
+## [2026-02-17] Remove Unverified DS Alert from Unified Calculator
+- **Change**: Removed "⚠️ Unverified in DS" badge that appeared when Cotton 42s (cu) was selected.
+- **Reason**: Cotton 42s factor (1.80) is now verified per handwritten spec; alert no longer required.
+- **File**: `src/app/dashboard/calculator/page.tsx`
+- **Verification**: No linter errors; build compiles (Convex URL required for full static gen on Vercel).
+
+## [2026-02-18] CLI Login Documentation
+- **Created**: `docs/CLI_LOGIN.md` — step-by-step guide for logging into GitHub, Vercel, and Convex.
+- **Updated**: `REPO_INDEX.md`, `LEARNINGS.md` with references.
+- **Purpose**: Future agents and users can follow the doc to authenticate before deployment.
+
+## [2026-02-18] Deployment to Staging & Production
+- **CLI Identity**: Logged out humanhdd432, logged in as harshddesai7 (GitHub), workwithharshdesai-7360 (Vercel), Harsh Desai's team (Convex).
+- **Convex Login**: Used `npx convex login --device-name "Cursor-Palej" --no-open --login-flow poll`; user approved at auth.convex.dev.
+- **Staging**: Pushed commit 7ff9f46 to origin (palej-app-staging). Vercel auto-deploys.
+- **Production**: Pushed 7ff9f46 to production remote (palej-conductors). Vercel auto-deploys.
+- **Changes**: Insulation factors (Cotton 42s 1.80, Poly+Cotton Cu 1.95), Cotton 42s default Copper, Factor calc fixes.
+
 ## [2026-02-17] Insulation Factor Updates (Handwritten Spec)
 - **Cotton 42s (cu)**: factor 0.70 → 1.80
 - **Poly + Cotton**: Added material-specific factors — factorAlu: 1.30, factorCu: 1.95 (was single factor: 1.30)

@@ -113,6 +113,7 @@
   - **Architecture Rule**: Each left-tab feature uses its own database table with auto-save and timestamps.
   - **Backward Compatibility**: Old `calculations` table retained temporarily with optional `saveMode` field.
 - **Recent Fixes:**
+  - Unverified DS alert removed from Unified Calculator (Cotton 42s now verified).
   - Hydration mismatch resolved in `layout.tsx`.
   - Mobile selector visibility fixed with `ChevronDown`.
   - Production build stabilized by excluding `docs/` from `tsconfig`.

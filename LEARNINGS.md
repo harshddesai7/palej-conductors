@@ -1,5 +1,14 @@
 # Learnings
 
+## CLI Login Procedures (2026-02-18)
+- **Full reference**: `docs/CLI_LOGIN.md` — GitHub, Vercel, Convex login steps for workwithharshdesai@gmail.com.
+- **Convex non-interactive**: Use `npx convex login --device-name "Cursor-Palej" --no-open --login-flow poll` when running from Cursor agent; approve at auth.convex.dev. Credentials save even if "link deployment" prompt fails.
+- **GitHub**: `gh auth login --web` — device flow; must use harshddesai7 for push access to palej-app-staging and palej-conductors.
+
+## Unverified DS Alert Removal (2026-02-17)
+- **Context**: The "Unverified in DS" badge was shown for Cotton 42s (cu) during forensic audit when its factor was not yet verified in legacy Zoho Creator `.ds` system.
+- **Removal**: Once Cotton 42s factor was updated to 1.80 per handwritten spec and considered verified, the alert was removed per user request. No other presets had this badge.
+
 ## Insulation Factor Updates (2026-02-17)
 - **Material-specific factors**: Presets like Poly + Cotton can use `factorAlu` and `factorCu` for different values per material. `getInsulationFactor()` checks factorAlu/factorCu first, then falls back to `factor`.
 - **Cotton 42s (cu)**: Cu-only cotton factor updated from 0.70 to 1.80 per business spec.

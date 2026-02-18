@@ -467,13 +467,8 @@ function UnifiedCalculatorContent() {
                         {/* Insulation Selector (Insulated mode only) */}
                         {mode === "INSULATED" && (
                         <div className="space-y-3 pt-4 border-t border-slate-100/50">
-                            <div className="flex items-center justify-between">
+                            <div>
                                 <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Insulation Preset</label>
-                                {selectedType === "Cotton 42s ( cu )" && (
-                                    <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100 animate-pulse">
-                                        ⚠️ Unverified in DS
-                                    </span>
-                                )}
                             </div>
                             <div className="relative">
                                 <select
