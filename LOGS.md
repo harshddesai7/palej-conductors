@@ -4,6 +4,10 @@
 > 
 > **Rule**: NEVER DELETE. NEVER MERGE. Only UPDATE/APPEND.
 
+## [2026-02-17] Cotton Presets: Preferred Material on Selection
+- **Change**: When user selects Cotton 42s (mainly cu), material auto-switches to Copper; Cotton 32s (mainly alu) → Aluminium. Users can still change material afterward.
+- **File**: `src/app/dashboard/calculator/page.tsx`
+
 ## [2026-02-17] Cotton Presets: Remove Material Restriction, Rename for Clarity
 - **Change**: Cotton 32s and Cotton 42s no longer restricted by material; users can select either regardless of Aluminium/Copper.
 - **Rename**: "Cotton 32s ( alu )" → "Cotton 32s ( mainly alu )"; "Cotton 42s ( cu )" → "Cotton 42s ( mainly cu )" — indicates best-fit material without forcing selection.

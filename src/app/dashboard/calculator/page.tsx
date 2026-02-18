@@ -249,15 +249,22 @@ function UnifiedCalculatorContent() {
         }
         const type = CONSTANTS.INSULATION_TYPES.find((t) => t.name === typeName);
         if (type) {
-            // When preset has material restriction (e.g. Cotton 42s cu → Copper), switch material to match
+            let effectiveMaterial = material;
             if (type.materialRestriction) {
+                effectiveMaterial = type.materialRestriction;
                 setMaterial(type.materialRestriction);
+            } else if (typeName === "Cotton 42s ( mainly cu )") {
+                effectiveMaterial = "COPPER";
+                setMaterial("COPPER");
+            } else if (typeName === "Cotton 32s ( mainly alu )") {
+                effectiveMaterial = "ALUMINIUM";
+                setMaterial("ALUMINIUM");
             }
             const newKV = type.kVOptions?.length ? (type.defaultKV ?? type.kVOptions[0].label) : "";
             setSelectedKV(newKV);
             setInputs((prev) => ({
                 ...prev,
-                factor: getInsulationFactor(type, type.materialRestriction ?? material, newKV || undefined),
+                factor: getInsulationFactor(type, effectiveMaterial, newKV || undefined),
                 insulationThickness: getDefaultThickness(type, shape),
                 polyCov: type.defaultLayer1Thickness ?? "",
                 dfgCov: type.defaultLayer2Thickness ?? "",
