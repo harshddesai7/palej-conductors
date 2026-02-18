@@ -90,8 +90,8 @@
 - **Modules (production & staging)**: Sidebar shows Unified Calculator (with Bare mode) and Factor Calculator only. LME Copper, Settings, Fabrication, Competitors, Work Instructions, and Die Calculator removed from nav (pages retained for restoration).
 - **Insulation kV Upgrade (Phase 2):**
   - Poly+DFG 225, 450, 900 presets support 8 kV / 18 kV selector (Alu: 1.45 / 1.35).
-  - Factors updated per image + Excel top-1 (DFG 1.50/1.70, Poly 1.40/1.30, Cotton 0.70, Enamel+DFG 0.85).
-  - New presets: Poly+Cotton (1.30), Poly+Paper (0.95, both materials).
+  - Factors updated per image + Excel top-1 (DFG 1.50/1.70, Poly 1.40/1.30, Enamel+DFG 0.85).
+  - Cotton 42s (cu): 1.80. Poly+Cotton: Al 1.30, Cu 1.95. Poly+Paper (0.95, both materials).
   - Material-restricted presets filtered; dual-layer uses combined factor + summed covering.
 - **Per-Feature Storage Architecture (2026-02-17):**
   - **Database Split**: Replaced monolithic `calculations` table with feature-specific tables:

@@ -4,6 +4,28 @@
 > 
 > **Rule**: NEVER DELETE. NEVER MERGE. Only UPDATE/APPEND.
 
+## [2026-02-17] Insulation Factor Updates (Handwritten Spec)
+- **Cotton 42s (cu)**: factor 0.70 → 1.80
+- **Poly + Cotton**: Added material-specific factors — factorAlu: 1.30, factorCu: 1.95 (was single factor: 1.30)
+- **File**: `src/lib/calculators/engine.ts`
+- **Verification**: `tsc --noEmit` passes.
+
+## [2026-02-17] Factor Calculator - Display Fix & Save Button Confirmation
+- **Issue**: User reported factor calculator saves but doesn't display the result; Save icon still visible in top area.
+- **Display Fix**: Added `min-h-[4.5rem]`, `flex items-center justify-center`, `tabular-nums`, and `Number.isFinite(factor)` guard to ensure calculated factor displays reliably and never collapses.
+- **Save Button**: Factor page has no Save button (removed in prior change). Header component has no Save button. Manual save removed; auto-save only.
+- **Files**: `src/app/dashboard/factor/page.tsx`
+
+## [2026-02-17] Factor Calculator - No Placeholders, Auto-Only, Remove Save Button
+- **Issue**: Factor Calculator showed "0" in all input fields (placeholder-like), was not auto-calculating/saving, and had a manual Save button in the header.
+- **Fix**:
+  1. **No placeholder values**: Changed inputs from numeric (0) to `Record<string, string | number>` with empty string `""` initial state. Fields now start empty; user types values from scratch.
+  2. **Auto-calculation**: Added `numInputs` useMemo to parse string/number inputs; calculation runs when width, thickness, covering > 0 and percentageIncrease >= 0.
+  3. **Auto-save only**: Removed manual Save button from header. Auto-save (1s debounce) remains; status indicators (Saving/Saved/Error) show in results panel.
+  4. **Removed Covering placeholder**: Dropped `placeholder="0.10 - 2.2"` per "no placeholder values" requirement.
+- **Files**: `src/app/dashboard/factor/page.tsx`
+- **Verification**: `tsc --noEmit` passes. Build requires `NEXT_PUBLIC_CONVEX_URL` (Vercel provides).
+
 ## [2026-02-14] Phase 1: Calculator App Migration
 - Scaffolded Next.js + Convex project with light glassmorphic theme.
 - Implemented modular math engine in `src/lib/calculators/engine.ts`.

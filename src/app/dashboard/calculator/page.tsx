@@ -249,11 +249,15 @@ function UnifiedCalculatorContent() {
         }
         const type = CONSTANTS.INSULATION_TYPES.find((t) => t.name === typeName);
         if (type) {
+            // When preset has material restriction (e.g. Cotton 42s cu → Copper), switch material to match
+            if (type.materialRestriction) {
+                setMaterial(type.materialRestriction);
+            }
             const newKV = type.kVOptions?.length ? (type.defaultKV ?? type.kVOptions[0].label) : "";
             setSelectedKV(newKV);
             setInputs((prev) => ({
                 ...prev,
-                factor: getInsulationFactor(type, material, newKV || undefined),
+                factor: getInsulationFactor(type, type.materialRestriction ?? material, newKV || undefined),
                 insulationThickness: getDefaultThickness(type, shape),
                 polyCov: type.defaultLayer1Thickness ?? "",
                 dfgCov: type.defaultLayer2Thickness ?? "",

@@ -1,11 +1,16 @@
 # Learnings
 
+## Insulation Factor Updates (2026-02-17)
+- **Material-specific factors**: Presets like Poly + Cotton can use `factorAlu` and `factorCu` for different values per material. `getInsulationFactor()` checks factorAlu/factorCu first, then falls back to `factor`.
+- **Cotton 42s (cu)**: Cu-only cotton factor updated from 0.70 to 1.80 per business spec.
+
 ## Factor Calculator - Zero Percentage Edge Case (2026-02-17)
 - **Validation vs UX**: Requiring `percentageIncrease > 0` prevented any result when user had 0%. For reverse-engineering, 0% yields factor 0 (valid). Use `>= 0` to allow edge case and show result.
 
 ## Factor Calculator Decimal Input (2026-02-17)
-- **Decimal Input UX**: For numeric fields that accept values like 0.10, 0.50, 1.5, 2.2 mm, explicitly set `step="0.01"` (not just 0.001) and `inputMode="decimal"` for mobile. Add `min`/`max` and `placeholder` to guide users on valid range.
+- **Decimal Input UX**: For numeric fields that accept values like 0.10, 0.50, 1.5, 2.2 mm, explicitly set `step="0.01"` (not just 0.001) and `inputMode="decimal"` for mobile. Add `min`/`max` for validation.
 - **Controlled Inputs**: When `value` is a number, React normalizes display (0.50 shows as 0.5). The value is correct; step/min/max ensure browser validation allows the range.
+- **No Placeholder Rule**: User preference: Factor Calculator should have no placeholder values. Use empty string `""` for initial state; parse via `Number(x) || 0` for calculation. Aligns with Unified Calculator pattern (`Record<string, string | number>`).
 
 ## Enhanced Search Database Table (2026-02-17)
 - **Frozen Column Pattern**: Using CSS `position: sticky` with `left: 0` and appropriate `z-index` creates frozen columns that stay visible during horizontal scroll. Critical for wide tables where key identifiers (like timestamps) must remain visible.
