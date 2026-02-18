@@ -8,7 +8,7 @@
 - **Change**: Cotton 32s and Cotton 42s no longer restricted by material; users can select either regardless of Aluminium/Copper.
 - **Rename**: "Cotton 32s ( alu )" → "Cotton 32s ( mainly alu )"; "Cotton 42s ( cu )" → "Cotton 42s ( mainly cu )" — indicates best-fit material without forcing selection.
 - **File**: `src/lib/calculators/engine.ts`
-- **Deployment**: Staging and production.
+- **Deployment**: Pushed to staging (da8f8eb) and production. Live at https://palej-app-staging.vercel.app and https://palej-conductors.vercel.app
 
 ## [2026-02-17] Remove Unverified DS Alert from Unified Calculator
 - **Change**: Removed "⚠️ Unverified in DS" badge that appeared when Cotton 42s (cu) was selected.
